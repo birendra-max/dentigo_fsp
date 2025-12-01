@@ -24,6 +24,7 @@ export const AdminProvider = ({ children }) => {
         localStorage.removeItem('admin');
         localStorage.removeItem('token');
         localStorage.removeItem('theme');
+        localStorage.removeItem('base_url');
         navigate('/admin', { replace: true });
     }
 

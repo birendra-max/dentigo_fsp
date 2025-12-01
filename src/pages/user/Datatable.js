@@ -145,7 +145,7 @@ export default function Datatable({
     const getBackgroundClass = () => {
         return theme === 'dark'
             ? 'bg-gray-900 text-white mt-4'
-            : 'bg-gradient-to-br from-slate-50 to-blue-50 text-gray-800 mt-4';
+            : 'bg-indigo-50 text-gray-800 mt-4';
     };
 
     const getTableHeaderClass = () => {
@@ -412,7 +412,7 @@ export default function Datatable({
 
                                                 alert(message);
                                             }}
-                                            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg shadow-lg flex items-center gap-2 transition-all duration-200 font-medium text-sm cursor-pointer"
+                                            className="px-4 py-2 bg-gradient-to-r from-pink-500 to-orange-600 hover:from-pink-600 hover:to-orange-700 text-white rounded-lg shadow-lg flex items-center gap-2 transition-all duration-200 font-medium text-sm cursor-pointer"
                                         >
                                             <FontAwesomeIcon icon={faRepeat} /> Send for Redesign
                                         </button>

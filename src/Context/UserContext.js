@@ -23,6 +23,7 @@ export const UserProvider = ({ children }) => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         localStorage.removeItem('theme');
+        localStorage.removeItem('base_url');
         navigate('/');
     }
 
