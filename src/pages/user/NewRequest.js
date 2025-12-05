@@ -113,7 +113,7 @@ export default function NewRequest() {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
-          "X-Tenant": "skydent",
+          "X-Tenant": "dentigo",
         },
         body: formData,
       });
