@@ -43,11 +43,11 @@ export default function Reports() {
                 ? 'bg-gradient-to-br from-gray-25 to-gray-50 text-gray-900'
                 : 'bg-gradient-to-br from-gray-900 to-gray-950 text-white',
             card: isLight
-                ? 'bg-gradient-to-br from-slate-50 to-blue-50 shadow-lg border border-gray-100'
-                : 'bg-gray-800 border-gray-700 shadow-xl',
+                ? 'bg-white shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-gray-200'
+                : 'bg-gray-800/90 backdrop-blur-sm border border-gray-700 shadow-[0_4px_20px_rgba(0,0,0,0.3)]',
             input: isLight
-                ? 'bg-white border-gray-300 focus:border-blue-500 text-gray-900 placeholder-gray-500 shadow-sm'
-                : 'bg-gray-700 border-gray-600 focus:border-blue-400 text-white placeholder-gray-400 shadow-sm',
+                ? 'bg-white border-2 border-gray-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/30 text-gray-900 placeholder-gray-500 shadow-sm'
+                : 'bg-gray-700 border-2 border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-white placeholder-gray-400 shadow-sm',
             button: {
                 primary: isLight
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all cursor-pointer'
@@ -62,8 +62,8 @@ export default function Reports() {
                     ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm'
                     : 'bg-gray-700 text-gray-200 border border-gray-600 hover:bg-gray-600 hover:border-gray-500 shadow-sm',
                 download: isLight
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg'
-                    : 'bg-emerald-700 hover:bg-emerald-600 text-white shadow-md hover:shadow-lg'
+                    ? 'bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white shadow-md hover:shadow-lg'
+                    : 'bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg'
             },
             text: {
                 primary: isLight ? 'text-gray-900' : 'text-white',
@@ -71,7 +71,10 @@ export default function Reports() {
                 muted: isLight ? 'text-gray-500' : 'text-gray-400',
                 accent: isLight ? 'text-blue-600' : 'text-blue-400'
             },
-            border: isLight ? 'border-gray-200' : 'border-gray-700'
+            border: isLight ? 'border-gray-200' : 'border-gray-700',
+            headerGradient: isLight
+                ? 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #1d4ed8 100%)'
+                : 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%)'
         };
     };
 
@@ -250,22 +253,6 @@ export default function Reports() {
         setOrderIdTo(value);
     };
 
-    const getHeaderClass = () => {
-        return theme === 'light'
-            ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100 text-gray-800'
-            : 'bg-gradient-to-r from-gray-800 to-blue-900/20 border-gray-700 text-white';
-    };
-
-    const getStatCardClass = (index) => {
-        const gradients = [
-            'from-blue-500 to-blue-600',
-            'from-emerald-500 to-green-600',
-            'from-amber-500 to-orange-600',
-            'from-purple-500 to-purple-600'
-        ];
-        return `bg-gradient-to-r ${gradients[index]} text-white`;
-    };
-
     // Apply filters whenever any filter criteria changes
     useEffect(() => {
         applyFilters();
@@ -314,15 +301,15 @@ export default function Reports() {
                 <div className="min-h-screen px-2 sm:px-6 lg:px-2">
                     <div className="w-full max-w-full">
 
-                        {/* Enhanced Header Section */}
-                        <header className={`rounded-xl border shadow-sm my-6 px-6 py-4 ${getHeaderClass()}`}>
+                        {/* Enhanced Header Section - ORIGINAL TEXT KEPT */}
+                        <header className={`rounded-xl border shadow-sm my-6 px-6 py-4`} style={{ background: themeClasses.headerGradient }}>
                             <div className="container mx-auto">
                                 <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
                                     <div className="text-center sm:text-left">
-                                        <h1 className={`text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent`}>
+                                        <h1 className="text-2xl sm:text-3xl font-bold text-white">
                                             Reports & Analytics
                                         </h1>
-                                        <p className={`mt-2 text-sm sm:text-base ${themeClasses.text.secondary}`}>
+                                        <p className="mt-2 text-sm sm:text-base text-blue-100">
                                             Generate comprehensive reports and analyze order performance
                                         </p>
                                     </div>
@@ -331,16 +318,16 @@ export default function Reports() {
                                             <li>
                                                 <Link
                                                     to="/designer/home"
-                                                    className={`hover:text-blue-700 transition-colors duration-300 flex items-center ${themeClasses.text.accent}`}
+                                                    className="hover:text-blue-700 transition-colors duration-300 flex items-center text-blue-100"
                                                 >
                                                     <FontAwesomeIcon icon={faHome} className="w-4 h-4 mr-2" />
                                                     <span>Dashboard</span>
                                                 </Link>
                                             </li>
-                                            <li className={themeClasses.text.muted}>
+                                            <li className="text-blue-300">
                                                 <span>/</span>
                                             </li>
-                                            <li className={themeClasses.text.muted}>
+                                            <li className="text-white font-semibold">
                                                 <span>Reports</span>
                                             </li>
                                         </ol>
@@ -352,7 +339,7 @@ export default function Reports() {
                         {/* Main Card Container */}
                         <div className={`rounded-xl ${themeClasses.card} p-6 mb-8`}>
 
-                            {/* Search Section */}
+                            {/* Search Section - ORIGINAL TEXT KEPT */}
                             <div className="mb-8">
                                 <div className="flex items-center justify-between mb-6">
                                     <h2 className={`text-xl font-semibold ${themeClasses.text.primary} flex items-center`}>
@@ -362,9 +349,9 @@ export default function Reports() {
                                     <div className="flex space-x-3">
                                         <button
                                             onClick={handleResetFilters}
-                                            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all ${theme === 'light'
-                                                ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                                                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                                            className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${theme === 'light'
+                                                ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100 border border-gray-300'
+                                                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border border-gray-600'
                                                 }`}
                                         >
                                             <FontAwesomeIcon icon={faSync} className="w-4 h-4" />
@@ -373,7 +360,7 @@ export default function Reports() {
                                         <button
                                             onClick={handleDownloadReport}
                                             disabled={filteredData.length === 0}
-                                            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all ${filteredData.length === 0
+                                            className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${filteredData.length === 0
                                                 ? 'bg-gray-400 cursor-not-allowed'
                                                 : themeClasses.button.download
                                                 }`}
@@ -397,7 +384,7 @@ export default function Reports() {
                                                 value={orderIdFrom}
                                                 onChange={handleOrderIdFromChange}
                                                 placeholder="e.g., 1001"
-                                                className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
+                                                className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
                                             />
                                         </div>
 
@@ -412,7 +399,7 @@ export default function Reports() {
                                                 value={orderIdTo}
                                                 onChange={handleOrderIdToChange}
                                                 placeholder="e.g., 2000"
-                                                className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
+                                                className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
                                             />
                                         </div>
 
@@ -426,7 +413,7 @@ export default function Reports() {
                                                 type="date"
                                                 value={startDate}
                                                 onChange={(e) => setStartDate(e.target.value)}
-                                                className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
+                                                className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
                                             />
                                         </div>
 
@@ -440,7 +427,7 @@ export default function Reports() {
                                                 type="date"
                                                 value={endDate}
                                                 onChange={(e) => setEndDate(e.target.value)}
-                                                className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
+                                                className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
                                             />
                                         </div>
 
@@ -469,7 +456,7 @@ export default function Reports() {
                                         </div>
                                     </div>
 
-                                    {/* Search Tips */}
+                                    {/* Search Tips - ORIGINAL TEXT KEPT */}
                                     <div className="mt-4 text-center">
                                         <p className={`text-xs ${themeClasses.text.muted}`}>
                                             Tip: Use Order ID range and date filters to refine your report. Showing {filteredData.length} of {allData.length} records.
@@ -478,7 +465,7 @@ export default function Reports() {
                                 </div>
                             </div>
 
-                            {/* Enhanced Filter Section */}
+                            {/* Enhanced Filter Section - ORIGINAL TEXT KEPT */}
                             <div className="mb-8">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className={`text-lg font-semibold ${themeClasses.text.primary} flex items-center`}>
@@ -514,7 +501,7 @@ export default function Reports() {
                                 </div>
                             </div>
 
-                            {/* Data Table Section */}
+                            {/* Data Table Section - ORIGINAL TEXT KEPT */}
                             <div className="mt-8">
                                 <Datatable
                                     columns={columns}

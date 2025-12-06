@@ -26,7 +26,7 @@ export default function MultiSearch() {
     const [allData, setAllData] = useState([]); // Store all data from backend
     const [filteredData, setFilteredData] = useState([]); // Store filtered data for display
 
-    // Professional theme-based classes
+    // Professional Police/Military theme classes (only styling changes)
     const getThemeClasses = () => {
         const isLight = theme === 'light';
         return {
@@ -34,11 +34,11 @@ export default function MultiSearch() {
                 ? 'bg-gradient-to-br from-gray-25 to-gray-50 text-gray-900'
                 : 'bg-gradient-to-br from-gray-900 to-gray-950 text-white',
             card: isLight
-                ? 'bg-gradient-to-br from-slate-50 to-blue-50 shadow-lg border border-gray-100'
-                : 'bg-gray-800 border-gray-700 shadow-xl',
+                ? 'bg-white shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-gray-200'
+                : 'bg-gray-800/90 backdrop-blur-sm border border-gray-700 shadow-[0_4px_20px_rgba(0,0,0,0.3)]',
             input: isLight
-                ? 'bg-white border-gray-300 focus:border-blue-500 text-gray-900 placeholder-gray-500 shadow-sm'
-                : 'bg-gray-700 border-gray-600 focus:border-blue-400 text-white placeholder-gray-400 shadow-sm',
+                ? 'bg-white border-2 border-gray-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/30 text-gray-900 placeholder-gray-500 shadow-sm'
+                : 'bg-gray-700 border-2 border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-white placeholder-gray-400 shadow-sm',
             button: {
                 primary: isLight
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all'
@@ -59,7 +59,11 @@ export default function MultiSearch() {
                 muted: isLight ? 'text-gray-500' : 'text-gray-400',
                 accent: isLight ? 'text-blue-600' : 'text-blue-400'
             },
-            border: isLight ? 'border-gray-200' : 'border-gray-700'
+            border: isLight ? 'border-gray-200' : 'border-gray-700',
+            // Only adding header gradient for styling, keeping same text
+            headerGradient: isLight
+                ? 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #1d4ed8 100%)'
+                : 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%)'
         };
     };
 
@@ -207,12 +211,6 @@ export default function MultiSearch() {
         });
     }, [allData]);
 
-    const getHeaderClass = () => {
-        return theme === 'light'
-            ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100 text-gray-800'
-            : 'bg-gradient-to-r from-gray-800 to-blue-900/20 border-gray-700 text-white';
-    };
-
     const getStatusBadgeClass = (status) => {
         const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
 
@@ -280,15 +278,15 @@ export default function MultiSearch() {
                 <div className="px-2 sm:px-6 lg:px-2">
                     <div className="w-full max-w-full">
 
-                        {/* Enhanced Header Section */}
-                        <header className={`rounded-xl border shadow-sm my-6 px-6 py-4 ${getHeaderClass()}`}>
+                        {/* Enhanced Header Section - ONLY STYLING CHANGES, TEXT SAME */}
+                        <header className={`rounded-xl border shadow-sm my-6 px-6 py-4`} style={{ background: themeClasses.headerGradient }}>
                             <div className="container mx-auto">
                                 <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
                                     <div className="text-center sm:text-left">
-                                        <h1 className={`text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent`}>
+                                        <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                                             Order Management
                                         </h1>
-                                        <p className={`mt-2 text-sm sm:text-base ${themeClasses.text.secondary}`}>
+                                        <p className="text-blue-100 mt-2 text-sm sm:text-base">
                                             Monitor and manage your dental laboratory orders
                                         </p>
                                     </div>
@@ -297,16 +295,16 @@ export default function MultiSearch() {
                                             <li>
                                                 <Link
                                                     to="/user/home"
-                                                    className={`hover:text-blue-700 transition-colors duration-300 flex items-center ${themeClasses.text.accent}`}
+                                                    className="text-blue-100 hover:text-white transition-colors duration-300 flex items-center"
                                                 >
                                                     <FontAwesomeIcon icon={faHome} className="w-4 h-4 mr-2" />
                                                     <span>Dashboard</span>
                                                 </Link>
                                             </li>
-                                            <li className={themeClasses.text.muted}>
+                                            <li className="text-blue-300">
                                                 <span>/</span>
                                             </li>
-                                            <li className={themeClasses.text.muted}>
+                                            <li className="text-white font-semibold">
                                                 <span>Orders</span>
                                             </li>
                                         </ol>
@@ -316,9 +314,9 @@ export default function MultiSearch() {
                         </header>
 
                         {/* Main Card Container */}
-                        <div className={`rounded-xl ${themeClasses.card}  p-6 mb-8`}>
+                        <div className={`rounded-xl ${themeClasses.card} p-6 mb-8`}>
 
-                            {/* Search Section */}
+                            {/* Search Section - TEXT ALL SAME */}
                             <div className="mb-8">
                                 <div className="flex items-center justify-between mb-6">
                                     <h2 className={`text-xl font-semibold ${themeClasses.text.primary} flex items-center`}>
@@ -327,9 +325,9 @@ export default function MultiSearch() {
                                     </h2>
                                     <button
                                         onClick={handleResetFilters}
-                                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all ${theme === 'light'
-                                            ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                                            : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                                        className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${theme === 'light'
+                                            ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100 border border-gray-300'
+                                            : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border border-gray-600'
                                             }`}
                                     >
                                         <FontAwesomeIcon icon={faSync} className="w-4 h-4" />
@@ -350,7 +348,7 @@ export default function MultiSearch() {
                                                 value={orderIdFrom}
                                                 onChange={handleOrderIdFromChange}
                                                 placeholder="e.g., 1001"
-                                                className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
+                                                className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
                                             />
                                         </div>
 
@@ -365,7 +363,7 @@ export default function MultiSearch() {
                                                 value={orderIdTo}
                                                 onChange={handleOrderIdToChange}
                                                 placeholder="e.g., 2000"
-                                                className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
+                                                className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
                                             />
                                         </div>
 
@@ -379,7 +377,7 @@ export default function MultiSearch() {
                                                 type="date"
                                                 value={startDate}
                                                 onChange={(e) => setStartDate(e.target.value)}
-                                                className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
+                                                className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
                                             />
                                         </div>
 
@@ -393,7 +391,7 @@ export default function MultiSearch() {
                                                 type="date"
                                                 value={endDate}
                                                 onChange={(e) => setEndDate(e.target.value)}
-                                                className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
+                                                className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 ${themeClasses.input}`}
                                             />
                                         </div>
 
@@ -402,7 +400,7 @@ export default function MultiSearch() {
                                             <button
                                                 onClick={handleSearchClick}
                                                 disabled={isLoading}
-                                                className={`w-44 h-12 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center cursor-pointer space-x-2 ${isLoading
+                                                className={`w-44 h-12 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer ${isLoading
                                                     ? 'bg-gray-400 cursor-not-allowed'
                                                     : themeClasses.button.success
                                                     }`}
@@ -431,7 +429,7 @@ export default function MultiSearch() {
                                 </div>
                             </div>
 
-                            {/* Enhanced Filter Section */}
+                            {/* Enhanced Filter Section - TEXT SAME */}
                             <div className="mb-8">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className={`text-lg font-semibold ${themeClasses.text.primary} flex items-center`}>

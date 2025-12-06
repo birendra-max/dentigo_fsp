@@ -4,16 +4,17 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ThemeContext } from "../../Context/ThemeContext";
 import {
-    faHome,
-    faUpload,
+    faGauge,
+    faCloudArrowUp,
+    faFilter,
+    faChartBar,
     faSearch,
-    faUser,
-    faSignOutAlt,
+    faUserCircle,
+    faArrowRightFromBracket,
     faMoon,
     faSun,
     faTimes,
     faBars,
-    faChartLine
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function Hd() {
@@ -87,10 +88,10 @@ export default function Hd() {
     }, [dropdownOpen, isOpen, mobileSearchOpen]);
 
     const navItems = [
-        { href: "/designer/home", label: "Dashboard", key: "index", icon: faHome },
-        { href: "/designer/new_request", label: "Upload Finish & Stl", key: "new_request", icon: faUpload },
-        { href: "/designer/multisearch", label: "Multi-Search", key: "multisearch", icon: faSearch },
-        { href: "/designer/reports", label: "Reports", key: "reports", icon: faChartLine }
+        { href: "/designer/home", label: "Dashboard", key: "index", icon: faGauge },
+        { href: "/designer/new_request", label: "File Upload Center", key: "new_request", icon: faCloudArrowUp },
+        { href: "/designer/multisearch", label: "Advanced Filters Orders", key: "multisearch", icon: faFilter },
+        { href: "/designer/reports", label: "Reports", key: "reports", icon: faChartBar }
     ];
 
     const applyTheme = (newTheme) => {
@@ -117,7 +118,7 @@ export default function Hd() {
     };
 
     return (
-        <header className="fixed z-50 top-0 left-0 w-full h-16 bg-gray-900 border-b border-gray-700">
+        <header className="fixed z-50 top-0 left-0 w-full h-16 bg-[#042333] border-b border-gray-700">
             <nav className="w-full h-full">
                 <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 h-full">
                     {/* Main Navigation Bar */}
@@ -136,7 +137,7 @@ export default function Hd() {
                                     <img 
                                         src="/img/logo.png" 
                                         alt="Logo" 
-                                        className="h-10 w-auto" 
+                                        className="h-13 w-auto" 
                                         onError={(e) => { e.target.src = '/img/placeholder-logo.png'; }} 
                                     />
                                 </div>
@@ -151,7 +152,7 @@ export default function Hd() {
                                         to={item.href}
                                         key={item.key}
                                         className={`px-4 py-2 rounded-md font-medium transition-all duration-200 flex items-center space-x-2 text-sm ${activePage === item.key
-                                            ? "bg-blue-600 text-white"
+                                            ? "bg-gradient-to-r from-pink-500 to-orange-600 hover:from-pink-600 hover:to-orange-700 text-white"
                                             : "text-gray-300 hover:text-white hover:bg-gray-800"
                                             }`}
                                     >
@@ -228,9 +229,6 @@ export default function Hd() {
                                     className="flex items-center space-x-3 p-2 cursor-pointer rounded-lg hover:bg-gray-800 transition-colors duration-200"
                                 >
                                     <div className="flex items-center space-x-3">
-                                        <div className="text-white font-semibold truncate text-sm sm:text-base">
-                                            {designer?.name || 'Designer'}
-                                        </div>
                                         <div className="relative">
                                             <img
                                                 src={designer?.pic && designer.pic !== '' ? designer.pic : '/img/user.webp'}
@@ -242,11 +240,14 @@ export default function Hd() {
                                             />
                                             <div className="absolute bottom-0 right-0 h-2 w-2 bg-green-500 rounded-full border-2 border-gray-900"></div>
                                         </div>
+                                        <div className="text-white font-semibold truncate text-sm sm:text-base">
+                                            {designer?.name || 'Designer'}
+                                        </div>
                                     </div>
                                 </button>
 
                                 {dropdownOpen && (
-                                    <div className="absolute right-0 mt-2 w-56 sm:w-64 bg-gray-800 rounded-xl shadow-2xl py-2 border border-gray-700 z-50 cursor-pointer backdrop-blur-sm">
+                                    <div className="absolute right-0 mt-2 w-56 sm:w-64 bg-[#042333] rounded-xl shadow-2xl py-2 border border-gray-700 z-50 cursor-pointer backdrop-blur-sm">
                                         <div className="px-4 py-3 border-b border-gray-700">
                                             <div className="text-white font-semibold truncate text-sm sm:text-base">
                                                 {designer?.name || 'Designer'}
@@ -261,14 +262,14 @@ export default function Hd() {
                                                 className="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200 flex items-center text-sm sm:text-base"
                                                 onClick={() => setDropdownOpen(false)}
                                             >
-                                                <FontAwesomeIcon icon={faUser} className="w-4 h-4 mr-3" />
+                                                <FontAwesomeIcon icon={faUserCircle} className="w-8 h-8 mr-3" />
                                                 Profile
                                             </Link>
                                             <button
                                                 onClick={logout}
                                                 className="block w-full text-left px-4 py-3 text-red-400 hover:bg-red-600 hover:text-white transition-all duration-200 flex items-center text-sm sm:text-base"
                                             >
-                                                <FontAwesomeIcon icon={faSignOutAlt} className="w-4 h-4 mr-3" />
+                                                <FontAwesomeIcon icon={faArrowRightFromBracket} className="w-4 h-4 mr-3" />
                                                 Logout
                                             </button>
                                         </div>
@@ -335,7 +336,7 @@ export default function Hd() {
                                         to={item.href}
                                         key={item.key}
                                         className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-colors duration-200 text-sm ${activePage === item.key
-                                            ? "bg-blue-600 text-white border border-blue-500"
+                                            ? "bg-gradient-to-r from-pink-500 to-orange-600 text-white border border-transparent"
                                             : "text-gray-300 hover:text-white hover:bg-gray-700"
                                             }`}
                                         onClick={() => setIsOpen(false)}
