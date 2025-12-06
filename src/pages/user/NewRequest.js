@@ -325,9 +325,8 @@ export default function NewRequest() {
       return theme === 'light' ? config[status]?.light : config[status]?.dark;
     };
 
-    const config = getStatusConfig(status.split(' ')[0]); // Get base status without percentage
+    const config = getStatusConfig(status.split(' ')[0]);
 
-    // For uploading status, show progress bar
     const isUploading = status.startsWith("Uploading...");
     const percentage = isUploading ? progress : 0;
 
@@ -342,9 +341,8 @@ export default function NewRequest() {
           <span>{status}</span>
         </div>
 
-        {/* Progress Bar for Uploading Files */}
         {isUploading && (
-          <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+          <div className={`w-full rounded-full h-2 ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'}`}>
             <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
               style={{ width: `${percentage}%` }}
@@ -368,14 +366,11 @@ export default function NewRequest() {
     <>
       <Hd />
       <main id="main" className={`flex-grow px-6 transition-colors duration-300 ${theme === 'light' ? 'bg-gray-50 text-gray-900' : 'bg-gray-950 text-white'} pt-20`}>
-        {/* Success Popup */}
         {showSuccessPopup && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className={`rounded-xl p-8 max-w-md mx-4 shadow-xl ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-gray-800 text-white'
-              }`}>
+            <div className={`rounded-xl p-8 max-w-md mx-4 shadow-xl ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-gray-800 text-white'}`}>
               <div className="text-center">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${theme === 'light' ? 'bg-green-100' : 'bg-green-900/20'
-                  }`}>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${theme === 'light' ? 'bg-green-100' : 'bg-green-900/20'}`}>
                   <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -396,18 +391,13 @@ export default function NewRequest() {
         )}
 
         <section className="max-w-8xl mx-auto">
-          {/* Main Content Card */}
           <div className={`rounded-xl border ${getCardClass()} mb-8`}>
-
-            {/* Upload Area - MODIFIED SECTION ONLY */}
             {files.length === 0 && (
               <div className="p-8">
                 <div
-                  className={`relative rounded-2xl border-3 border-dashed transition-all duration-200 ${
-                    drag 
+                  className={`relative rounded-2xl border-3 border-dashed transition-all duration-200 ${drag 
                       ? 'border-blue-500 bg-blue-50 scale-[1.02]' 
-                      : 'border-gray-300 hover:border-blue-400'
-                  } ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}
+                      : 'border-gray-300 hover:border-blue-400'} ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}
                   onDragEnter={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -425,19 +415,16 @@ export default function NewRequest() {
                   onDrop={handleDrop}
                 >
                   <div className="p-16 text-center">
-                    <div className={`w-32 h-32 rounded-full mx-auto mb-8 flex items-center justify-center ${
-                      theme === 'light' ? 'bg-blue-50' : 'bg-gray-700'
-                    }`}>
+                    <div className={`w-32 h-32 rounded-full mx-auto mb-8 flex items-center justify-center ${theme === 'light' ? 'bg-blue-50' : 'bg-gray-700'}`}>
                       <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                    <h3 className="text-2xl font-semibold mb-4">
                       {drag ? "Drop to upload" : "Drag & drop files here"}
                     </h3>
-                    <p className="text-gray-500 dark:text-gray-400 mb-8 text-lg">or click to browse your computer</p>
-                    <label className={`inline-flex items-center px-8 py-4 font-medium rounded-lg cursor-pointer transition-colors text-lg ${
-                      theme === 'light'
+                    <p className={`mb-8 text-lg ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>or click to browse your computer</p>
+                    <label className={`inline-flex items-center px-8 py-4 font-medium rounded-lg cursor-pointer transition-colors text-lg ${theme === 'light'
                         ? 'bg-blue-600 hover:bg-blue-700 text-white'
                         : 'bg-blue-700 hover:bg-blue-600 text-white'
                       } hover:shadow-lg`}>
@@ -453,16 +440,14 @@ export default function NewRequest() {
                         onChange={(e) => handleFiles(e.target.files)}
                       />
                     </label>
-                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-6">Only .zip files are supported</p>
+                    <p className={`text-sm mt-6 ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>Only .zip files are supported</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Files Table - KEEPING YOUR ORIGINAL CODE */}
             {files.length > 0 && (
               <div className="p-6">
-                {/* Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   {[
                     { count: files.length, label: "Total Files", bg: "bg-blue-500" },
@@ -477,7 +462,6 @@ export default function NewRequest() {
                   ))}
                 </div>
 
-                {/* Table Container */}
                 <div className={`rounded-lg border ${getTableContainerClass()} mb-8`}>
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -505,8 +489,7 @@ export default function NewRequest() {
                         {files.map((file, idx) => (
                           <tr key={idx} className={getTableRowClass()}>
                             <td className="px-4 py-3">
-                              <span className={`text-sm font-medium px-2 py-1 rounded ${theme === 'light' ? 'bg-gray-100 text-gray-900' : 'bg-gray-700 text-white'
-                                }`}>
+                              <span className={`text-sm font-medium px-2 py-1 rounded ${theme === 'light' ? 'bg-gray-100 text-gray-900' : 'bg-gray-700 text-white'}`}>
                                 {file.orderId}
                               </span>
                             </td>
@@ -554,10 +537,8 @@ export default function NewRequest() {
                   </div>
                 </div>
 
-                {/* Delivery Options and Submit Section */}
                 <div className={`rounded-xl border p-6 ${getTableContainerClass()} shadow-sm`}>
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Delivery Options */}
                     <div className="lg:col-span-2">
                       <h3 className={`text-xl font-bold mb-6 ${theme === 'light' ? 'text-black' : 'text-white'}`}>Delivery Options</h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -567,7 +548,6 @@ export default function NewRequest() {
                             label: "Rush Delivery",
                             description: "1-2 Hours",
                             tagline: "Fastest possible",
-                            // price: "+$50",
                             color: "red",
                             icon: (
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -580,7 +560,6 @@ export default function NewRequest() {
                             label: "Same Day",
                             description: "6 Hours",
                             tagline: "Quick turnaround",
-                            // price: "+$25",
                             color: "yellow",
                             icon: (
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -593,7 +572,6 @@ export default function NewRequest() {
                             label: "Next Day",
                             description: "12 Hours",
                             tagline: "Standard delivery",
-                            // price: "Free",
                             color: "green",
                             icon: (
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -627,7 +605,6 @@ export default function NewRequest() {
                               className="sr-only"
                             />
 
-                            {/* Radio Button */}
                             <div className="flex-shrink-0 mr-4 mt-1">
                               <div className={`
       w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
@@ -648,11 +625,9 @@ export default function NewRequest() {
                               </div>
                             </div>
 
-                            {/* Content */}
                             <div className="flex-1">
                               <div className="flex items-start space-x-3">
 
-                                {/* Icon Box (always white when selected) */}
                                 <div className={`
         flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-all
         ${selectedDuration === option.value
@@ -665,7 +640,6 @@ export default function NewRequest() {
                                   {option.icon}
                                 </div>
 
-                                {/* Text Area */}
                                 <div className="flex-1 min-w-0">
                                   <span
                                     className={`font-bold text-base block 
@@ -694,7 +668,6 @@ export default function NewRequest() {
                               </div>
                             </div>
 
-                            {/* Selection Tick */}
                             {selectedDuration === option.value && (
                               <div className="absolute -top-2 -right-2">
                                 <div className={`
@@ -716,7 +689,6 @@ export default function NewRequest() {
                         ))}
                       </div>
 
-                      {/* Helper text to indicate selection */}
                       <div className={`mt-4 text-sm ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
                         <div className="flex items-center space-x-2">
                           <div className="w-3 h-3 rounded-full border-2 border-gray-400 flex items-center justify-center">
@@ -727,7 +699,6 @@ export default function NewRequest() {
                       </div>
                     </div>
 
-                    {/* Submit Section */}
                     <div className="flex flex-col justify-between">
                       <div>
                         <h3 className={`text-xl font-bold mb-6 ${theme === 'light' ? 'text-black' : 'text-white'}`}>Submit Orders</h3>

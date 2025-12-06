@@ -109,7 +109,9 @@ export default function Profile() {
                 const data = await profileresp.json();
                 const statusEl = document.getElementById('profilestatus');
                 if (data.status === 'success') {
-                    statusEl.className = `w-full px-2 sm:px-4 text-xs sm:text-sm font-bold text-center mb-2 ${theme === 'light' ? 'text-green-700' : 'text-green-400'
+                    statusEl.className = `w-full text-center text-sm font-medium py-2 px-4 rounded-lg transition-all duration-300 ${theme === 'light'
+                        ? 'bg-green-50 text-green-700 border border-green-200'
+                        : 'bg-green-900/20 text-green-400 border border-green-800'
                         }`;
                     statusEl.innerText = data.message;
                     await fetchUserData();
@@ -117,13 +119,17 @@ export default function Profile() {
                         statusEl.innerText = '';
                     }, 3000);
                 } else {
-                    statusEl.className = `w-full px-2 sm:px-4 text-xs sm:text-sm font-bold text-center mb-2 ${theme === 'light' ? 'text-red-700' : 'text-red-400'
+                    statusEl.className = `w-full text-center text-sm font-medium py-2 px-4 rounded-lg transition-all duration-300 ${theme === 'light'
+                        ? 'bg-red-50 text-red-700 border border-red-200'
+                        : 'bg-red-900/20 text-red-400 border border-red-800'
                         }`;
                     statusEl.innerText = data.message;
                 }
             } catch (err) {
                 const statusEl = document.getElementById('profilestatus');
-                statusEl.className = `w-full px-2 sm:px-4 text-xs sm:text-sm font-bold text-center mb-2 ${theme === 'light' ? 'text-red-700' : 'text-red-400'
+                statusEl.className = `w-full text-center text-sm font-medium py-2 px-4 rounded-lg transition-all duration-300 ${theme === 'light'
+                    ? 'bg-red-50 text-red-700 border border-red-200'
+                    : 'bg-red-900/20 text-red-400 border border-red-800'
                     }`;
                 statusEl.innerText = 'Upload failed. Please try again.';
             } finally {
@@ -154,7 +160,9 @@ export default function Profile() {
             const resp = await response.json();
             const statusEl = document.getElementById('status');
             if (resp.status === 'success') {
-                statusEl.className = `w-full px-2 sm:px-4 text-sm sm:text-base font-bold text-center mb-2 ${theme === 'light' ? 'text-green-700' : 'text-green-400'
+                statusEl.className = `w-full text-center text-sm font-medium py-2 px-4 rounded-lg transition-all duration-300 ${theme === 'light'
+                    ? 'bg-green-50 text-green-700 border border-green-200'
+                    : 'bg-green-900/20 text-green-400 border border-green-800'
                     }`;
                 statusEl.innerText = resp.message;
                 await fetchUserData();
@@ -162,13 +170,17 @@ export default function Profile() {
                     statusEl.innerText = '';
                 }, 3000);
             } else {
-                statusEl.className = `w-full px-2 sm:px-4 text-sm sm:text-base font-bold text-center mb-2 ${theme === 'light' ? 'text-red-700' : 'text-red-400'
+                statusEl.className = `w-full text-center text-sm font-medium py-2 px-4 rounded-lg transition-all duration-300 ${theme === 'light'
+                    ? 'bg-red-50 text-red-700 border border-red-200'
+                    : 'bg-red-900/20 text-red-400 border border-red-800'
                     }`;
                 statusEl.innerText = resp.message;
             }
         } catch (error) {
             const statusEl = document.getElementById('status');
-            statusEl.className = `w-full px-2 sm:px-4 text-sm sm:text-base font-bold text-center mb-2 ${theme === 'light' ? 'text-red-700' : 'text-red-400'
+            statusEl.className = `w-full text-center text-sm font-medium py-2 px-4 rounded-lg transition-all duration-300 ${theme === 'light'
+                ? 'bg-red-50 text-red-700 border border-red-200'
+                : 'bg-red-900/20 text-red-400 border border-red-800'
                 }`;
             statusEl.innerText = 'Update failed. Please try again.';
         } finally {
@@ -176,65 +188,65 @@ export default function Profile() {
         }
     };
 
-    // Theme-based styling functions
+    // Enhanced theme-based styling
     const getMainClass = () => {
         return theme === 'light'
-            ? 'bg-gray-100 sm:bg-gray-200'
-            : 'bg-black';
+            ? 'bg-gradient-to-b from-gray-50 to-white'
+            : 'bg-gradient-to-b from-gray-900 to-gray-950';
     };
 
     const getHeaderClass = () => {
         return theme === 'light'
-            ? 'bg-white border-gray-200 text-gray-800'
-            : 'bg-gray-800 border-gray-700 text-white';
+            ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
+            : 'bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-xl';
     };
 
     const getCardClass = () => {
         return theme === 'light'
-            ? 'bg-white border-gray-200 text-gray-800'
-            : 'bg-gray-800 border-gray-700 text-white';
+            ? 'bg-white shadow-lg border border-gray-100 rounded-xl'
+            : 'bg-gray-800/80 shadow-xl border border-gray-700 rounded-xl backdrop-blur-sm';
     };
 
     const getInputClass = () => {
         return theme === 'light'
-            ? 'bg-white border-gray-200 text-gray-800 focus:ring-blue-500 focus:border-blue-500'
-            : 'bg-gray-700 border-gray-600 text-white focus:ring-blue-500 focus:border-blue-500';
+            ? 'bg-white border-gray-300 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm'
+            : 'bg-gray-700/50 border-gray-600 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-inner';
     };
 
     const getDisabledInputClass = () => {
         return theme === 'light'
-            ? 'bg-gray-50 border-gray-200 text-gray-500'
-            : 'bg-gray-600 border-gray-500 text-gray-400';
+            ? 'bg-gray-50 border-gray-200 text-gray-600 shadow-sm'
+            : 'bg-gray-700/30 border-gray-700 text-gray-400 shadow-inner';
     };
 
     const getTabHeaderClass = () => {
         return theme === 'light'
-            ? 'bg-gray-50 border-gray-200'
-            : 'bg-gray-700 border-gray-600';
+            ? 'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200'
+            : 'bg-gradient-to-r from-gray-800 to-gray-900 border-gray-700';
     };
 
     const getTabButtonClass = (isActive) => {
         if (isActive) {
             return theme === 'light'
-                ? 'text-blue-600 border-blue-600'
-                : 'text-blue-400 border-blue-400';
+                ? 'text-blue-700 border-blue-600 bg-white shadow-sm'
+                : 'text-blue-300 border-blue-500 bg-gray-800 shadow-inner';
         } else {
             return theme === 'light'
-                ? 'text-gray-500 border-transparent hover:text-blue-500'
-                : 'text-gray-400 border-transparent hover:text-blue-400';
+                ? 'text-gray-600 border-transparent hover:text-blue-600 hover:bg-white/50'
+                : 'text-gray-400 border-transparent hover:text-blue-400 hover:bg-gray-700/50';
         }
     };
 
     const getLabelClass = () => {
         return theme === 'light'
-            ? 'text-gray-700'
-            : 'text-gray-300';
+            ? 'text-gray-800 font-semibold'
+            : 'text-gray-200 font-semibold';
     };
 
     const getBorderClass = () => {
         return theme === 'light'
             ? 'border-gray-200'
-            : 'border-gray-600';
+            : 'border-gray-700';
     };
 
     const getDividerClass = () => {
@@ -247,16 +259,27 @@ export default function Profile() {
         return (
             <>
                 <Hd />
-                <main id="main" className={`flex-grow px-4 transition-colors duration-300 ${theme === 'light' ? 'bg-white text-black' : 'bg-black text-white'} pt-16 sm:pt-22`}>
-                    <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-                        <div className="flex justify-center items-center min-h-80 sm:min-h-96">
-                            <div className="text-center px-4">
-                                <FontAwesomeIcon icon={faExclamationTriangle} className="w-12 h-12 sm:w-16 sm:h-16 text-yellow-500 mb-3 sm:mb-4" />
-                                <h2 className={`text-xl sm:text-2xl font-bold mb-2 ${theme === 'light' ? 'text-gray-800' : 'text-white'
-                                    }`}>User Not Found</h2>
-                                <p className={theme === 'light' ? 'text-gray-600' : 'text-gray-400'}>
-                                    Please log in to view your profile.
+                <main className={`min-h-screen transition-colors duration-300 ${getMainClass()} pt-16 sm:pt-22`}>
+                    <div className="container mx-auto px-4 py-6">
+                        <div className="flex justify-center items-center min-h-[70vh]">
+                            <div className="text-center px-4 max-w-md">
+                                <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-yellow-100' : 'bg-yellow-900/30'}`}>
+                                    <FontAwesomeIcon icon={faExclamationTriangle} className="w-10 h-10 text-yellow-600" />
+                                </div>
+                                <h2 className={`text-2xl font-bold mb-4 ${theme === 'light' ? 'text-gray-800' : 'text-white'
+                                    }`}>Designer Profile Not Found</h2>
+                                <p className={`mb-6 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                                    Please log in to access your designer profile information.
                                 </p>
+                                <Link
+                                    to="/designer/login"
+                                    className={`inline-flex items-center px-6 py-3 rounded-lg font-medium transition-all ${theme === 'light'
+                                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                                        : 'bg-blue-700 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl'
+                                        }`}
+                                >
+                                    Go to Designer Login
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -265,36 +288,44 @@ export default function Profile() {
             </>
         );
     }
+    console.log(designer);
 
     return (
         <>
             <Hd />
-            <main className={`min-h-screen transition-colors duration-300 py-22 ${getMainClass()}`}>
-                {/* Header Section */}
-                <header className={`border-b shadow-sm px-4 ${getHeaderClass()}`}>
-                    <div className="container mx-auto px-3 sm:px py-4 sm:py-3">
-                        <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="text-center sm:text-left">
-                                <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'light' ? 'text-gray-800' : 'text-white'
-                                    }`}>
-                                    Profile Overview
-                                </h1>
-                                <p className={`mt-1 text-sm sm:text-base ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'
-                                    }`}>Manage your account settings and preferences</p>
-                            </div>
-                            <nav className="flex justify-center sm:justify-start">
-                                <ol className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm">
-                                    <li>
-                                        <Link to="/designer/home" className={`hover:text-blue-800 transition-colors duration-300 flex items-center ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'
+            <main className={`min-h-screen transition-colors duration-300 ${getMainClass()} pt-20 pb-12`}>
+                {/* Enhanced Header Section */}
+                <header className={`relative z-10 border-b shadow-xl px-4 ${getHeaderClass()}`}>
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                            <div className="text-center lg:text-left">
+                                <div className="flex items-center justify-center lg:justify-start gap-3">
+                                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${theme === 'light' ? 'bg-white/20' : 'bg-gray-800/30'}`}>
+                                        <FontAwesomeIcon icon={faUser} className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h1 className={`text-2xl font-bold ${theme === 'light' ? 'text-white' : 'text-white'
                                             }`}>
-                                            <FontAwesomeIcon icon={faHome} className="w-3 h-3 mr-1 sm:mr-2" />
-                                            <span className="hidden xs:inline">Home</span>
+                                            Profile Management
+                                        </h1>
+                                        <p className={`mt-1 text-sm ${theme === 'light' ? 'text-blue-100' : 'text-gray-300'
+                                            }`}>Manage your designer account settings and preferences securely</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <nav className="flex justify-center lg:justify-end">
+                                <ol className="flex items-center space-x-3 text-sm bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
+                                    <li>
+                                        <Link to="/designer/home" className={`hover:text-blue-200 transition-colors duration-300 flex items-center ${theme === 'light' ? 'text-white' : 'text-gray-200'
+                                            }`}>
+                                            <FontAwesomeIcon icon={faHome} className="w-4 h-4 mr-2" />
+                                            <span>Dashboard</span>
                                         </Link>
                                     </li>
                                     <li className="flex items-center">
-                                        <span className={`mx-1 sm:mx-2 ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'
+                                        <span className={`mx-2 ${theme === 'light' ? 'text-blue-200' : 'text-gray-500'
                                             }`}>/</span>
-                                        <span className={`font-semibold truncate max-w-[120px] sm:max-w-none ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'
+                                        <span className={`font-semibold truncate ${theme === 'light' ? 'text-white' : 'text-gray-200'
                                             }`}>
                                             {designer.name}
                                         </span>
@@ -306,102 +337,103 @@ export default function Profile() {
                 </header>
 
                 {/* Main Content */}
-                <div className="mx-auto py-4 sm:py-4 px-3 sm:px-4">
-                    <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-4">
+                <div className=" mx-auto px-4 py-8">
+                    <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
 
-                        {/* Left Sidebar - Profile Card */}
+                        {/* Left Sidebar - Enhanced Profile Card */}
                         <div className="xl:col-span-1">
-                            <div className={`rounded-lg sm:rounded-xl shadow-md sm:shadow-lg border p-4 sm:p-6 ${getCardClass()}`}>
-                                {/* Profile Image */}
-                                <div className="text-center mb-4 sm:mb-6">
+                            <div className={`${getCardClass()} p-6`}>
+                                {/* Profile Image Section */}
+                                <div className="text-center mb-6">
                                     <div className="relative inline-block">
-                                        <div className="relative">
+                                        <div className="relative group">
                                             {!designer.pic || designer.pic === '' ? (
                                                 <img
-                                                    className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-lg sm:rounded-xl mx-auto border-4 shadow-md"
+                                                    className="w-32 h-32 rounded-xl mx-auto border-4 shadow-lg group-hover:scale-105 transition-transform duration-300"
                                                     src="/img/user.webp"
-                                                    alt="User profile"
+                                                    alt="Designer profile"
                                                 />
                                             ) : (
                                                 <img
-                                                    className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-lg sm:rounded-xl mx-auto border-4 shadow-md object-cover"
+                                                    className="w-32 h-32 rounded-xl mx-auto border-4 shadow-lg object-cover group-hover:scale-105 transition-transform duration-300"
                                                     src={`${designer.pic}`}
-                                                    alt="User profile"
+                                                    alt="Designer profile"
                                                 />
                                             )}
+                                            <div className={`absolute inset-0 rounded-xl bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${theme === 'light' ? '' : 'from-white/5'}`}></div>
                                             {profileLoading && (
-                                                <div className={`absolute inset-0 bg-opacity-70 rounded-lg sm:rounded-xl flex items-center justify-center ${theme === 'light' ? 'bg-white' : 'bg-gray-900'
+                                                <div className={`absolute inset-0 bg-opacity-80 rounded-xl flex items-center justify-center ${theme === 'light' ? 'bg-white' : 'bg-gray-900'
                                                     }`}>
-                                                    <FontAwesomeIcon icon={faSpinner} className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 animate-spin" />
+                                                    <FontAwesomeIcon icon={faSpinner} className="w-8 h-8 text-blue-500 animate-spin" />
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full border-2 sm:border-4 border-white shadow-lg flex items-center justify-center">
-                                            <FontAwesomeIcon icon={faCheckCircle} className="w-2 h-2 sm:w-3 sm:h-3 text-white" />
+                                        <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full border-4 shadow-lg flex items-center justify-center ${theme === 'light' ? 'bg-green-500 border-white' : 'bg-green-600 border-gray-800'}`}>
+                                            <FontAwesomeIcon icon={faCheckCircle} className="w-4 h-4 text-white" />
                                         </div>
                                     </div>
 
-                                    <h3 className={`text-lg sm:text-xl font-bold mt-3 sm:mt-4 truncate px-2 ${theme === 'light' ? 'text-gray-800' : 'text-white'
+                                    <h3 className={`text-xl font-bold mt-4 ${theme === 'light' ? 'text-gray-900' : 'text-white'
                                         }`}>
                                         {designer.name || 'Designer'}
                                     </h3>
-                                    <p className={`text-xs sm:text-sm mt-1 font-medium ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'
-                                        }`}>Professional Account</p>
-                                    <div className="flex items-center justify-center mt-2">
-                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
-                                        <span className="text-green-600 text-xs font-medium">Online</span>
+                                    <p className={`text-sm mt-1 font-medium ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'
+                                        }`}>Certified Dental Designer</p>
+                                    <div className="flex items-center justify-center mt-2 space-x-2">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <span className="text-green-600 text-sm font-medium">Active & Online</span>
                                     </div>
                                 </div>
 
-                                {/* Client Info */}
-                                <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
-                                    <div className={`flex justify-between items-center py-2 border-b ${getDividerClass()}`}>
-                                        <span className={`font-medium flex items-center text-xs sm:text-sm ${getLabelClass()}`}>
-                                            <FontAwesomeIcon icon={faIdCard} className="w-3 h-3 text-blue-500 mr-2" />
-                                            Client ID
+                                {/* Client Info Section */}
+                                <div className="space-y-4 mb-6">
+                                    <div className={`flex justify-between items-center py-3 px-4 rounded-lg ${theme === 'light' ? 'bg-blue-50' : 'bg-gray-700/50'}`}>
+                                        <span className={`font-medium flex items-center text-sm ${getLabelClass()}`}>
+                                            <FontAwesomeIcon icon={faIdCard} className="w-4 h-4 text-blue-500 mr-2" />
+                                            Designer ID
                                         </span>
-                                        <span className={`font-semibold px-2 py-1 rounded-md text-xs sm:text-sm ${theme === 'light' ? 'text-gray-800 bg-blue-50' : 'text-white bg-blue-900/20'
+                                        <span className={`font-bold px-3 py-1 rounded-md text-sm ${theme === 'light' ? 'text-gray-800 bg-white shadow-sm' : 'text-white bg-gray-800 shadow-inner'
                                             }`}>
                                             #{designer.desiid}
                                         </span>
                                     </div>
-                                    <div className={`flex justify-between items-center py-2 border-b ${getDividerClass()}`}>
-                                        <span className={`font-medium flex items-center text-xs sm:text-sm ${getLabelClass()}`}>
-                                            <FontAwesomeIcon icon={faCalendarAlt} className="w-3 h-3 text-purple-500 mr-2" />
+                                    <div className={`flex justify-between items-center py-3 px-4 rounded-lg ${theme === 'light' ? 'bg-purple-50' : 'bg-purple-900/20'}`}>
+                                        <span className={`font-medium flex items-center text-sm ${getLabelClass()}`}>
+                                            <FontAwesomeIcon icon={faCalendarAlt} className="w-4 h-4 text-purple-500 mr-2" />
                                             Member Since
                                         </span>
-                                        <span className={`font-semibold text-xs sm:text-sm ${theme === 'light' ? 'text-gray-800' : 'text-white'
+                                        <span className={`font-semibold text-sm ${theme === 'light' ? 'text-gray-800' : 'text-white'
                                             }`}>
-                                            {designer.joining_date || 'N/A'}
+                                            {designer.desi_added_date || 'Not Specified'}
                                         </span>
                                     </div>
                                 </div>
 
-                                {/* Status Button */}
+                                {/* Account Status Button */}
                                 {designer.status !== 'active' ? (
-                                    <button className={`w-full text-white font-bold py-2 sm:py-3 px-3 sm:px-4 rounded-lg transition-all duration-300 mb-4 sm:mb-6 shadow-md flex items-center justify-center text-xs sm:text-sm ${theme === 'light'
-                                        ? 'bg-green-500 hover:bg-green-600'
-                                        : 'bg-green-600 hover:bg-green-700'
+                                    <button className={`w-full text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 mb-6 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center ${theme === 'light'
+                                        ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
+                                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
                                         }`}>
-                                        <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
-                                        Active Your Account
+                                        <div className="w-2 h-2 bg-white rounded-full animate-pulse mr-2"></div>
+                                        Activate Designer Account
                                     </button>
                                 ) : (
-                                    <button className={`w-full text-white font-bold py-2 sm:py-3 px-3 sm:px-4 rounded-lg transition-all duration-300 mb-4 sm:mb-6 shadow-md text-xs sm:text-sm ${theme === 'light'
-                                        ? 'bg-red-500 hover:bg-red-600'
-                                        : 'bg-red-600 hover:bg-red-700'
+                                    <button className={`w-full text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 mb-6 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${theme === 'light'
+                                        ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+                                        : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
                                         }`}>
-                                        Inactive Your Account
+                                        Deactivate Account
                                     </button>
                                 )}
 
-                                {/* Profile Picture Upload */}
-                                <div className="space-y-3 sm:space-y-4">
-                                    <p id="profilestatus" className="w-full text-center text-xs sm:text-sm"></p>
+                                {/* Profile Picture Upload Section */}
+                                <div className="space-y-4">
+                                    <p id="profilestatus" className="w-full text-center text-sm"></p>
                                     <div>
-                                        <label className={`text-xs sm:text-sm font-semibold mb-2 flex items-center ${getLabelClass()}`}>
-                                            <FontAwesomeIcon icon={faCamera} className="w-3 h-3 mr-2 text-blue-500" />
-                                            Update Profile Picture
+                                        <label className={`text-sm font-semibold mb-3 flex items-center ${getLabelClass()}`}>
+                                            <FontAwesomeIcon icon={faCamera} className="w-4 h-4 mr-2 text-blue-500" />
+                                            Update Profile Image
                                         </label>
                                         <div className="relative">
                                             <input
@@ -410,233 +442,263 @@ export default function Profile() {
                                                 accept='image/*'
                                                 onChange={handleFileChange}
                                                 disabled={profileLoading}
-                                                className={`w-full px-2 sm:px-3 py-2 border-2 border-dashed rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 file:mr-2 sm:file:mr-4 file:py-1 file:px-2 sm:file:px-3 file:rounded file:border-0 file:text-xs sm:file:text-sm file:font-semibold disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light'
-                                                    ? 'bg-gray-50 border-gray-300 text-gray-700 file:bg-blue-500 file:text-white hover:file:bg-blue-600'
-                                                    : 'bg-gray-700 border-gray-600 text-gray-300 file:bg-blue-600 file:text-white hover:file:bg-blue-700'
+                                                className={`w-full px-4 py-3 border-2 border-dashed rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light'
+                                                    ? 'bg-gray-50 border-gray-300 text-gray-700 file:bg-gradient-to-r file:from-blue-500 file:to-blue-600 file:text-white hover:file:from-blue-600 hover:file:to-blue-700'
+                                                    : 'bg-gray-800/50 border-gray-600 text-gray-300 file:bg-gradient-to-r file:from-blue-600 file:to-blue-700 file:text-white hover:file:from-blue-700 hover:file:to-blue-800'
                                                     }`}
                                             />
+                                            <div className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${profileLoading ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
+                                                <FontAwesomeIcon icon={faSpinner} className="w-4 h-4 text-blue-500 animate-spin" />
+                                            </div>
                                         </div>
+                                        <p className={`text-xs mt-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                                            Recommended: Square image, max 2MB
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Content - Personal Details */}
+                        {/* Right Content - Designer Details */}
                         <div className="xl:col-span-3">
-                            <div className={`rounded-lg sm:rounded-xl shadow-md sm:shadow-lg border overflow-hidden ${getCardClass()}`}>
-                                {/* Tab Header */}
-                                <div className={`px-4 sm:px-6 py-3 sm:py-4 border-b ${getTabHeaderClass()} ${getBorderClass()}`}>
-                                    <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto">
+                            <div className={`${getCardClass()} overflow-hidden`}>
+                                {/* Enhanced Tab Header */}
+                                <div className={`px-6 py-4 border-b ${getTabHeaderClass()}`}>
+                                    <nav className="flex space-x-1">
                                         <button
                                             onClick={() => setActiveTab('personal')}
-                                            className={`font-semibold pb-2 sm:pb-3 px-2 border-b-2 transition-all duration-300 flex items-center whitespace-nowrap flex-shrink-0 ${getTabButtonClass(activeTab === 'personal')}`}
+                                            className={`font-semibold px-6 py-3 rounded-lg border-b-2 transition-all duration-300 flex items-center ${getTabButtonClass(activeTab === 'personal')}`}
                                         >
-                                            <FontAwesomeIcon icon={faUser} className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                                            Personal Details
+                                            <FontAwesomeIcon icon={faUser} className="w-4 h-4 mr-2" />
+                                            Designer Details
                                         </button>
                                     </nav>
                                 </div>
 
                                 {/* Tab Content */}
-                                <div className="p-4 sm:p-6">
-                                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                                <div className="p-6">
+                                    <form onSubmit={handleSubmit} className="space-y-6">
                                         <input type="hidden" name="email" value={form.email} />
 
                                         {/* Responsive Grid Layout */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                                            {/* Row 1 */}
-                                            <div className="flex flex-col space-y-2">
-                                                <label className={`font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center ${getLabelClass()}`}>
-                                                    <FontAwesomeIcon icon={faUserTie} className="w-3 h-3 text-blue-500 mr-2" />
-                                                    Designation
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="designation"
-                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base ${getInputClass()}`}
-                                                    value={form.designation}
-                                                    onChange={handleProfile}
-                                                />
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                            {/* Professional Information */}
+                                            <div className="space-y-6">
+                                                {/* Row 1 */}
+                                                <div className="flex flex-col space-y-2">
+                                                    <label className={`font-semibold text-sm uppercase tracking-wider flex items-center ${getLabelClass()}`}>
+                                                        <FontAwesomeIcon icon={faUserTie} className="w-4 h-4 text-blue-500 mr-2" />
+                                                        Designation
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="designation"
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${getInputClass()}`}
+                                                        value={form.designation}
+                                                        onChange={handleProfile}
+                                                        placeholder="Enter your designer title"
+                                                    />
+                                                </div>
+
+                                                {/* Row 2 */}
+                                                <div className="flex flex-col space-y-2">
+                                                    <label className={`font-semibold text-sm uppercase tracking-wider flex items-center ${getLabelClass()}`}>
+                                                        <FontAwesomeIcon icon={faStethoscope} className="w-4 h-4 text-blue-500 mr-2" />
+                                                        Occlusion
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="occlusion"
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${getInputClass()}`}
+                                                        value={form.occlusion}
+                                                        onChange={handleProfile}
+                                                        placeholder="Enter occlusion details"
+                                                    />
+                                                </div>
+
+                                                {/* Row 3 */}
+                                                <div className="flex flex-col space-y-2">
+                                                    <label className={`font-semibold text-sm uppercase tracking-wider flex items-center ${getLabelClass()}`}>
+                                                        <FontAwesomeIcon icon={faPhone} className="w-4 h-4 text-blue-500 mr-2" />
+                                                        Mobile Contact
+                                                    </label>
+                                                    <input
+                                                        type="tel"
+                                                        name="mobile"
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${getInputClass()}`}
+                                                        value={form.mobile}
+                                                        onChange={handleProfile}
+                                                        placeholder="Enter mobile number"
+                                                    />
+                                                </div>
+
+                                                {/* Row 4 */}
+                                                <div className="flex flex-col space-y-2">
+                                                    <label className={`font-semibold text-sm uppercase tracking-wider flex items-center ${getLabelClass()}`}>
+                                                        <FontAwesomeIcon icon={faPhone} className="w-4 h-4 text-blue-500 mr-2" />
+                                                        Contact
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="contact"
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${getInputClass()}`}
+                                                        value={form.contact}
+                                                        onChange={handleProfile}
+                                                        placeholder="Enter alternate contact"
+                                                    />
+                                                </div>
                                             </div>
 
-                                            <div className="flex flex-col space-y-2">
-                                                <label className={`font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center ${getLabelClass()}`}>
-                                                    <FontAwesomeIcon icon={faEnvelope} className="w-3 h-3 text-blue-500 mr-2" />
-                                                    Email Address
-                                                </label>
-                                                <input
-                                                    type="email"
-                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg focus:outline-none transition-all duration-300 cursor-not-allowed text-sm sm:text-base ${getDisabledInputClass()}`}
-                                                    value={form.email}
-                                                    readOnly
-                                                />
+                                            {/* Laboratory & Medical Details */}
+                                            <div className="space-y-6">
+                                                {/* Row 1 */}
+                                                <div className="flex flex-col space-y-2">
+                                                    <label className={`font-semibold text-sm uppercase tracking-wider flex items-center ${getLabelClass()}`}>
+                                                        <FontAwesomeIcon icon={faEnvelope} className="w-4 h-4 text-blue-500 mr-2" />
+                                                        Professional Email
+                                                    </label>
+                                                    <input
+                                                        type="email"
+                                                        className={`w-full px-4 py-3 border rounded-lg transition-all duration-300 cursor-not-allowed ${getDisabledInputClass()}`}
+                                                        value={form.email}
+                                                        readOnly
+                                                    />
+                                                </div>
+
+                                                {/* Row 2 */}
+                                                <div className="flex flex-col space-y-2">
+                                                    <label className={`font-semibold text-sm uppercase tracking-wider flex items-center ${getLabelClass()}`}>
+                                                        <FontAwesomeIcon icon={faFlask} className="w-4 h-4 text-blue-500 mr-2" />
+                                                        Laboratory Name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="labname"
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${getInputClass()}`}
+                                                        value={form.labname}
+                                                        onChange={handleProfile}
+                                                        placeholder="Enter laboratory name"
+                                                    />
+                                                </div>
+
+                                                {/* Row 3 */}
+                                                <div className="flex flex-col space-y-2">
+                                                    <label className={`font-semibold text-sm uppercase tracking-wider flex items-center ${getLabelClass()}`}>
+                                                        <FontAwesomeIcon icon={faStethoscope} className="w-4 h-4 text-blue-500 mr-2" />
+                                                        Anatomy
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="anatomy"
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${getInputClass()}`}
+                                                        value={form.anatomy}
+                                                        onChange={handleProfile}
+                                                        placeholder="Enter anatomy details"
+                                                    />
+                                                </div>
+
+                                                {/* Row 4 */}
+                                                <div className="flex flex-col space-y-2">
+                                                    <label className={`font-semibold text-sm uppercase tracking-wider flex items-center ${getLabelClass()}`}>
+                                                        <FontAwesomeIcon icon={faStethoscope} className="w-4 h-4 text-blue-500 mr-2" />
+                                                        Pontic
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="pontic"
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${getInputClass()}`}
+                                                        value={form.pontic}
+                                                        onChange={handleProfile}
+                                                        placeholder="Enter pontic design preferences"
+                                                    />
+                                                </div>
                                             </div>
 
-                                            {/* Row 2 */}
-                                            <div className="flex flex-col space-y-2">
-                                                <label className={`font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center ${getLabelClass()}`}>
-                                                    <FontAwesomeIcon icon={faStethoscope} className="w-3 h-3 text-blue-500 mr-2" />
-                                                    Occlusion
+                                            {/* Full Width Fields */}
+                                            {/* Row 5 - Password field with enhanced design */}
+                                            <div className="lg:col-span-2 flex flex-col space-y-2">
+                                                <label className={`font-semibold text-sm uppercase tracking-wider flex items-center ${getLabelClass()}`}>
+                                                    <FontAwesomeIcon icon={faKey} className="w-4 h-4 text-blue-500 mr-2" />
+                                                    New Password
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    name="occlusion"
-                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base ${getInputClass()}`}
-                                                    value={form.occlusion}
-                                                    onChange={handleProfile}
-                                                />
-                                            </div>
-
-                                            <div className="flex flex-col space-y-2">
-                                                <label className={`font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center ${getLabelClass()}`}>
-                                                    <FontAwesomeIcon icon={faFlask} className="w-3 h-3 text-blue-500 mr-2" />
-                                                    Lab Name
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="labname"
-                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base ${getInputClass()}`}
-                                                    value={form.labname}
-                                                    onChange={handleProfile}
-                                                />
-                                            </div>
-
-                                            {/* Row 3 */}
-                                            <div className="flex flex-col space-y-2">
-                                                <label className={`font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center ${getLabelClass()}`}>
-                                                    <FontAwesomeIcon icon={faPhone} className="w-3 h-3 text-blue-500 mr-2" />
-                                                    Mobile Number
-                                                </label>
-                                                <input
-                                                    type="tel"
-                                                    name="mobile"
-                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base ${getInputClass()}`}
-                                                    value={form.mobile}
-                                                    onChange={handleProfile}
-                                                />
-                                            </div>
-
-                                            <div className="flex flex-col space-y-2">
-                                                <label className={`font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center ${getLabelClass()}`}>
-                                                    <FontAwesomeIcon icon={faStethoscope} className="w-3 h-3 text-blue-500 mr-2" />
-                                                    Anatomy
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="anatomy"
-                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base ${getInputClass()}`}
-                                                    value={form.anatomy}
-                                                    onChange={handleProfile}
-                                                />
-                                            </div>
-
-                                            {/* Row 4 */}
-                                            <div className="flex flex-col space-y-2">
-                                                <label className={`font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center ${getLabelClass()}`}>
-                                                    <FontAwesomeIcon icon={faPhone} className="w-3 h-3 text-blue-500 mr-2" />
-                                                    Contact
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="contact"
-                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base ${getInputClass()}`}
-                                                    value={form.contact}
-                                                    onChange={handleProfile}
-                                                />
-                                            </div>
-
-                                            <div className="flex flex-col space-y-2">
-                                                <label className={`font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center ${getLabelClass()}`}>
-                                                    <FontAwesomeIcon icon={faStethoscope} className="w-3 h-3 text-blue-500 mr-2" />
-                                                    Pontic
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="pontic"
-                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base ${getInputClass()}`}
-                                                    value={form.pontic}
-                                                    onChange={handleProfile}
-                                                />
-                                            </div>
-
-                                            {/* Row 5 - Password field with eye button */}
-                                            <div className="md:col-span-2 flex flex-col space-y-2">
-                                                <label className={`font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center ${getLabelClass()}`}>
-                                                    <FontAwesomeIcon icon={faKey} className="w-3 h-3 text-blue-500 mr-2" />
-                                                    Password
-                                                </label>
-                                                <div className="relative">
+                                                <div className="relative group">
                                                     <input
                                                         type={showPassword ? "text" : "password"}
                                                         name="password"
-                                                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base pr-10 sm:pr-12 ${getInputClass()}`}
-                                                        placeholder="Enter new password"
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 pr-12 ${getInputClass()}`}
+                                                        placeholder="Enter new password for security update"
                                                         value={form.password}
                                                         onChange={handleProfile}
                                                     />
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowPassword(!showPassword)}
-                                                        className={`absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 transition-colors duration-300 p-1 ${theme === 'light' ? 'text-gray-400 hover:text-blue-500' : 'text-gray-500 hover:text-blue-400'
+                                                        className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-colors duration-300 p-2 rounded-lg ${theme === 'light'
+                                                            ? 'text-gray-500 hover:text-blue-600 hover:bg-gray-100'
+                                                            : 'text-gray-400 hover:text-blue-400 hover:bg-gray-700'
                                                             }`}
                                                     >
                                                         <FontAwesomeIcon
                                                             icon={showPassword ? faEyeSlash : faEye}
-                                                            className="w-4 h-4 sm:w-5 sm:h-5"
+                                                            className="w-5 h-5"
                                                         />
                                                     </button>
                                                 </div>
-                                                <p className={`text-xs mt-1 flex items-center ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                                                <p className={`text-sm mt-2 flex items-center ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'
                                                     }`}>
-                                                    <FontAwesomeIcon icon={faKey} className="w-3 h-3 text-blue-400 mr-1" />
-                                                    Leave blank to keep current password
+                                                    <FontAwesomeIcon icon={faKey} className="w-3 h-3 text-blue-400 mr-2" />
+                                                    Leave blank to maintain current password security
                                                 </p>
                                             </div>
 
                                             {/* Row 6 - Remarks field */}
-                                            <div className="md:col-span-2 flex flex-col space-y-2">
-                                                <label className={`font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center ${getLabelClass()}`}>
-                                                    <FontAwesomeIcon icon={faNotesMedical} className="w-3 h-3 text-blue-500 mr-2" />
-                                                    Remarks & Notes
+                                            <div className="lg:col-span-2 flex flex-col space-y-2">
+                                                <label className={`font-semibold text-sm uppercase tracking-wider flex items-center ${getLabelClass()}`}>
+                                                    <FontAwesomeIcon icon={faNotesMedical} className="w-4 h-4 text-blue-500 mr-2" />
+                                                    Designer Notes & Remarks
                                                 </label>
                                                 <textarea
                                                     name="remark"
-                                                    rows="3"
-                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 resize-vertical text-sm sm:text-base ${getInputClass()}`}
+                                                    rows="4"
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 resize-vertical ${getInputClass()}`}
                                                     value={form.remark}
                                                     onChange={handleProfile}
+                                                    placeholder="Enter any additional notes, preferences, or special instructions..."
                                                 />
                                             </div>
                                         </div>
 
-                                        {/* Submit Button */}
-                                        <div className={`pt-4 sm:pt-6 border-t ${getBorderClass()}`}>
-                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                                                <div className={`text-xs sm:text-sm text-center sm:text-left ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                                        {/* Enhanced Submit Section */}
+                                        <div className={`pt-6 border-t ${getBorderClass()}`}>
+                                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                                                <div className={`text-sm text-center lg:text-left ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'
                                                     }`}>
-                                                    Last updated: {designer.joining_date}
+                                                    <div className="flex items-center justify-center lg:justify-start space-x-2">
+                                                        <FontAwesomeIcon icon={faCalendarAlt} className="w-4 h-4 text-blue-500" />
+                                                        <span>Profile Last Updated: {designer.last_updated || 'N/A'}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex flex-col items-stretch sm:items-end gap-2">
-                                                    <p id="status" className="w-full text-center sm:text-right text-xs sm:text-sm"></p>
+                                                <div className="flex flex-col items-stretch lg:items-end gap-3">
+                                                    <p id="status" className="w-full text-center lg:text-right text-sm"></p>
                                                     <button
                                                         disabled={formStatus === 0 || loading}
                                                         type="submit"
-                                                        className={`cursor-pointer text-white font-bold py-2 sm:py-3 px-4 sm:px-8 rounded-lg transition-all duration-300 shadow-md flex items-center justify-center text-sm sm:text-base w-full sm:w-auto ${formStatus === 0 || loading
+                                                        className={`cursor-pointer text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center text-sm lg:text-base w-full lg:w-auto ${formStatus === 0 || loading
                                                             ? "opacity-50 cursor-not-allowed"
                                                             : "hover:bg-blue-600"
                                                             } ${theme === 'light'
-                                                                ? 'bg-blue-500 hover:bg-blue-600'
-                                                                : 'bg-blue-600 hover:bg-blue-700'
-                                                            }`}>
+                                                                ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+                                                                : 'bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900'
+                                                                }`}>
                                                         {loading ? (
                                                             <>
-                                                                <FontAwesomeIcon icon={faSpinner} className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
-                                                                Updating...
+                                                                <FontAwesomeIcon icon={faSpinner} className="w-4 h-4 mr-2 animate-spin" />
+                                                                Processing Update...
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <FontAwesomeIcon icon={faSave} className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                                                                Save All Changes
+                                                                <FontAwesomeIcon icon={faSave} className="w-4 h-4 mr-2" />
+                                                                Save Designer Changes
                                                             </>
                                                         )}
                                                     </button>
