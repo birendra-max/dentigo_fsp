@@ -9,7 +9,7 @@ import {
     faFilter,
     faChartBar,
     faSearch,
-    faUserCircle, 
+    faUserCircle,
     faArrowRightFromBracket,
     faMoon,
     faSun,
@@ -147,7 +147,7 @@ export default function Hd() {
                                         to={item.href}
                                         key={item.key}
                                         className={`px-4 py-2 rounded-md font-medium transition-all duration-200 flex items-center space-x-2 text-sm ${activePage === item.key
-                                            ? "bg-pink-700 text-white"
+                                            ? "bg-gradient-to-r from-pink-500 to-orange-600 hover:from-pink-600 hover:to-orange-700 text-white"
                                             : "text-gray-300 hover:text-white hover:bg-gray-800"
                                             }`}
                                     >
@@ -224,9 +224,6 @@ export default function Hd() {
                                     className="flex items-center space-x-3 p-2 cursor-pointer rounded-lg hover:bg-gray-800 transition-colors duration-200"
                                 >
                                     <div className="flex items-center space-x-3">
-                                        <div className="text-white font-semibold truncate text-sm sm:text-base">
-                                            {user?.name || 'User'}
-                                        </div>
                                         <div className="relative">
                                             <img
                                                 src={user?.pic && user.pic !== '' ? user.pic : '/img/user.webp'}
@@ -237,6 +234,9 @@ export default function Hd() {
                                                 }}
                                             />
                                             <div className="absolute bottom-0 right-0 h-2 w-2 bg-green-500 rounded-full border-2 border-gray-900"></div>
+                                        </div>
+                                        <div className="text-white font-semibold truncate text-sm sm:text-base">
+                                            {user?.name || 'User'}
                                         </div>
                                     </div>
                                 </button>

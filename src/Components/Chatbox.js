@@ -70,7 +70,7 @@ export default function Chatbox({ orderid }) {
     const loadChatHistory = async () => {
         try {
             const response = await fetch(`${config.API_BASE_URL}/chat/get-chat-history/${orderid}`, {
-                headers: { 'Authorization': `Bearer ${token}`, 'X-Tenant': 'skydent' }
+                headers: { 'Authorization': `Bearer ${token}`, 'X-Tenant': 'dentigo' }
             });
             const data = await response.json();
 
@@ -125,7 +125,7 @@ export default function Chatbox({ orderid }) {
         if (!orderid || !token || eventSourceRef.current) return;
 
         // const url = `${config.API_BASE_URL}/chat/stream-chat/${orderid}?lastId=${lastMessageIdRef.current}`;
-        const url = `${config.API_BASE_URL}/chat/stream-chat/${orderid}?lastId=${lastMessageIdRef.current}&tenant=skydent`;
+        const url = `${config.API_BASE_URL}/chat/stream-chat/${orderid}?lastId=${lastMessageIdRef.current}&tenant=dentigo`;
 
 
         try {
@@ -237,7 +237,7 @@ export default function Chatbox({ orderid }) {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
-                    'X-Tenant': 'skydent'
+                    'X-Tenant': 'dentigo'
                 },
                 body: JSON.stringify({
                     orderid,
@@ -275,7 +275,7 @@ export default function Chatbox({ orderid }) {
 
         fetch(`${config.API_BASE_URL}/chat/chat-file`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'X-Tenant': 'skydent' },
+            headers: { 'Authorization': `Bearer ${token}`, 'X-Tenant': 'dentigo' },
             body: formData
         })
             .then(res => res.json())
