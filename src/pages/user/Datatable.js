@@ -483,7 +483,7 @@ export default function Datatable({
     const getTableHeaderClass = () => {
         return theme === 'dark'
             ? 'bg-gradient-to-r from-gray-800 to-gray-700 text-white border-b border-gray-600'
-            : 'bg-gradient-to-r from-cyan-800 to-cyan-900 text-white border-b border-blue-500';
+            : 'bg-gradient-to-r from-slate-700 to-slate-800 text-white border-b border-slate-600';
     };
 
     const getTableRowClass = (idx) => {

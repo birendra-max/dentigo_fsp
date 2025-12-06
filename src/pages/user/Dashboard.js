@@ -138,147 +138,147 @@ export default function Dashboard() {
     useEffect(() => {
         if (cases) {
             const updatedCards = [
-                { 
-                    id: "today", 
-                    href: "/user/today_cases", 
-                    title: "Today's Cases", 
-                    subtitle: "Active for today", 
-                    count: cases.today_cases, 
-                    color: "from-amber-500 to-yellow-500", 
-                    icon: faSun, 
-                    accent: "bg-amber-500", 
+                {
+                    id: "today",
+                    href: "/user/today_cases",
+                    title: "Today's Cases",
+                    subtitle: "Active for today",
+                    count: cases.today_cases,
+                    color: "from-amber-500 to-yellow-500",
+                    icon: faSun,
+                    accent: "bg-amber-500",
                     priority: "high",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "home", 
-                    href: "/user/home", 
-                    title: "New Cases", 
-                    subtitle: "Awaiting review", 
-                    count: cases.new_cases, 
-                    color: "from-blue-500 to-cyan-500", 
+                {
+                    id: "home",
+                    href: "/user/home",
+                    title: "New Cases",
+                    subtitle: "Awaiting review",
+                    count: cases.new_cases,
+                    color: "from-blue-500 to-cyan-500",
                     icon: faFileAlt,  // Changed from faBox
-                    accent: "bg-blue-500", 
+                    accent: "bg-blue-500",
                     priority: "high",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "progress", 
-                    href: "/user/in_progress", 
-                    title: "In Progress", 
-                    subtitle: "Currently working", 
-                    count: cases.progress, 
-                    color: "from-teal-500 to-emerald-500", 
+                {
+                    id: "progress",
+                    href: "/user/in_progress",
+                    title: "In Progress",
+                    subtitle: "Currently working",
+                    count: cases.progress,
+                    color: "from-teal-500 to-emerald-500",
                     icon: faHourglassHalf,  // Changed from faClock
-                    accent: "bg-teal-500", 
+                    accent: "bg-teal-500",
                     priority: "medium",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "completed", 
-                    href: "/user/completed_case", 
-                    title: "Completed", 
-                    subtitle: "Ready for delivery", 
-                    count: cases.completed, 
-                    color: "from-green-500 to-lime-500", 
+                {
+                    id: "completed",
+                    href: "/user/completed_case",
+                    title: "Completed",
+                    subtitle: "Ready for delivery",
+                    count: cases.completed,
+                    color: "from-green-500 to-lime-500",
                     icon: faCheckCircle,  // Changed from faCheckDouble
-                    accent: "bg-green-500", 
+                    accent: "bg-green-500",
                     priority: "low",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "rush", 
-                    href: "/user/rush_cases", 
-                    title: "Rush Cases", 
-                    subtitle: "High priority", 
-                    count: cases.rush, 
-                    color: "from-red-500 to-pink-500", 
+                {
+                    id: "rush",
+                    href: "/user/rush_cases",
+                    title: "Rush Cases",
+                    subtitle: "High priority",
+                    count: cases.rush,
+                    color: "from-red-500 to-pink-500",
                     icon: faFlag,  // Changed from faRunning
-                    accent: "bg-red-500", 
+                    accent: "bg-red-500",
                     priority: "high",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "qc", 
-                    href: "/user/qc_required", 
-                    title: "QC Required", 
-                    subtitle: "Quality check", 
-                    count: cases.qc, 
-                    color: "from-purple-500 to-violet-500", 
+                {
+                    id: "qc",
+                    href: "/user/qc_required",
+                    title: "QC Required",
+                    subtitle: "Quality check",
+                    count: cases.qc,
+                    color: "from-purple-500 to-violet-500",
                     icon: faClipboardList,  // Changed from faClipboardCheck
-                    accent: "bg-purple-500", 
+                    accent: "bg-purple-500",
                     priority: "medium",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "hold", 
-                    href: "/user/case_on_hold", 
-                    title: "On Hold", 
-                    subtitle: "Pending information", 
-                    count: cases.hold, 
-                    color: "from-gray-500 to-slate-500", 
+                {
+                    id: "hold",
+                    href: "/user/case_on_hold",
+                    title: "On Hold",
+                    subtitle: "Pending information",
+                    count: cases.hold,
+                    color: "from-gray-500 to-slate-500",
                     icon: faPauseCircle,  // Changed from faHandPaper
-                    accent: "bg-gray-500", 
+                    accent: "bg-gray-500",
                     priority: "medium",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "canceled", 
-                    href: "/user/canceled_case", 
-                    title: "Cancelled", 
-                    subtitle: "Terminated cases", 
-                    count: cases.canceled, 
-                    color: "from-rose-500 to-red-500", 
+                {
+                    id: "canceled",
+                    href: "/user/canceled_case",
+                    title: "Cancelled",
+                    subtitle: "Terminated cases",
+                    count: cases.canceled,
+                    color: "from-rose-500 to-red-500",
                     icon: faExclamationCircle,  // Changed from faBan
-                    accent: "bg-rose-500", 
+                    accent: "bg-rose-500",
                     priority: "low",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "all_c", 
-                    href: "/user/all_cases", 
-                    title: "All Cases", 
-                    subtitle: "Total overview", 
-                    count: cases.all, 
-                    color: "from-indigo-500 to-blue-600", 
+                {
+                    id: "all_c",
+                    href: "/user/all_cases",
+                    title: "All Cases",
+                    subtitle: "Total overview",
+                    count: cases.all,
+                    color: "from-indigo-500 to-blue-600",
                     icon: faTasks,  // Changed from faBriefcase
-                    accent: "bg-indigo-500", 
+                    accent: "bg-indigo-500",
                     priority: "low",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "yesterday", 
-                    href: "/user/yesterday_cases", 
-                    title: "Yesterday", 
-                    subtitle: "Previous day", 
-                    count: cases.yesterday_cases, 
-                    color: "from-cyan-500 to-sky-500", 
+                {
+                    id: "yesterday",
+                    href: "/user/yesterday_cases",
+                    title: "Yesterday",
+                    subtitle: "Previous day",
+                    count: cases.yesterday_cases,
+                    color: "from-cyan-500 to-sky-500",
                     icon: faCalendarCheck,  // Changed from faCalendarDay
-                    accent: "bg-cyan-500", 
+                    accent: "bg-cyan-500",
                     priority: "low",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "weekly", 
-                    href: "/user/weekly_case", 
-                    title: "Weekly", 
-                    subtitle: "This week", 
-                    count: cases.weekly_cases, 
-                    color: "from-fuchsia-500 to-pink-500", 
+                {
+                    id: "weekly",
+                    href: "/user/weekly_case",
+                    title: "Weekly",
+                    subtitle: "This week",
+                    count: cases.weekly_cases,
+                    color: "from-fuchsia-500 to-pink-500",
                     icon: faCalendar,  // Changed from faCalendarWeek
-                    accent: "bg-fuchsia-500", 
+                    accent: "bg-fuchsia-500",
                     priority: "medium",
                     iconSize: "text-lg"
                 },
-                { 
-                    id: "Redesign", 
-                    href: "/user/redesign_cases", 
-                    title: "Redesign", 
-                    subtitle: "Revision needed", 
-                    count: cases.redesign_cases, 
-                    color: "from-emerald-500 to-teal-500", 
+                {
+                    id: "Redesign",
+                    href: "/user/redesign_cases",
+                    title: "Redesign",
+                    subtitle: "Revision needed",
+                    count: cases.redesign_cases,
+                    color: "from-emerald-500 to-teal-500",
                     icon: faSyncAlt,  // Changed from faRedo
-                    accent: "bg-emerald-500", 
+                    accent: "bg-emerald-500",
                     priority: "medium",
                     iconSize: "text-lg"
                 },
@@ -411,7 +411,7 @@ export default function Dashboard() {
                                                 icon={card.icon}
                                                 className="text-white text-lg"
                                             />
-                                            
+
                                             {/* Subtle glow effect on hover */}
                                             <div className={`absolute inset-0 rounded-xl ${card.accent} opacity-0 group-hover:opacity-30 transition-opacity duration-200`}></div>
                                         </div>
@@ -569,19 +569,27 @@ export default function Dashboard() {
                 <div className="fixed bottom-6 right-6 z-40">
                     <button
                         onClick={handleOpenModal}
-                        className="group relative cursor-pointer"
+                        className="group relative cursor-pointer animate-bounce hover:animate-none"
                     >
                         {/* Main button */}
-                        <div className="relative w-12 h-12 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110 rounded-xl overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-700"></div>
+                        <div className="relative w-12 h-12 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110 rounded-full overflow-hidden">
+                            {/* Blinking glow ring */}
+                            <div className={`absolute -inset-1 rounded-full animate-ping opacity-20 ${theme === 'dark' ? 'bg-blue-400' : 'bg-blue-500'
+                                }`} style={{ animationDuration: '2s' }}></div>
+
+                            {/* Main gradient */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full"></div>
+
+                            {/* Pulsing border */}
+                            <div className={`absolute inset-0 rounded-full border-2 animate-pulse ${theme === 'dark' ? 'border-blue-400/50' : 'border-blue-300/50'
+                                }`} style={{ animationDuration: '1.5s' }}></div>
+
                             <div className="relative w-full h-full flex items-center justify-center">
                                 <FontAwesomeIcon
                                     icon={faHeart}
                                     className="text-white text-sm group-hover:scale-110 transition-transform duration-200"
                                 />
                             </div>
-                            {/* Button shine */}
-                            <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/30 to-transparent rounded-t-xl"></div>
                         </div>
 
                         {/* Tooltip */}

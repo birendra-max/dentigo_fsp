@@ -255,22 +255,8 @@ export default function NewRequest() {
   // Professional color scheme - Navy Blue & Slate
   const getCardClass = () => {
     return theme === 'light'
-      ? 'bg-white border-gray-200 shadow-sm'
+      ? 'bg-gradient-to-br from-teal-50 via-pink-50 to-cyan-50 border-gray-200 shadow-sm'
       : 'bg-gray-900 border-gray-800 shadow-lg';
-  };
-
-  const getUploadAreaClass = () => {
-    const baseClass = "border-2 min-h-[75vh] flex justify-center items-center flex-col border-dashed rounded-lg p-12 text-center transition-all duration-200";
-
-    if (theme === 'light') {
-      return drag
-        ? `${baseClass} border-blue-600 bg-blue-50 scale-[1.01] text-gray-900`
-        : `${baseClass} border-gray-300 hover:border-blue-500 hover:bg-gray-50 text-gray-900`;
-    } else {
-      return drag
-        ? `${baseClass} border-blue-500 bg-blue-900/10 scale-[1.01] text-white`
-        : `${baseClass} border-gray-600 hover:border-blue-400 hover:bg-gray-800/50 text-white`;
-    }
   };
 
   const getTableContainerClass = () => {
@@ -413,11 +399,15 @@ export default function NewRequest() {
           {/* Main Content Card */}
           <div className={`rounded-xl border ${getCardClass()} mb-8`}>
 
-            {/* Upload Area */}
+            {/* Upload Area - MODIFIED SECTION ONLY */}
             {files.length === 0 && (
               <div className="p-8">
                 <div
-                  className={getUploadAreaClass()}
+                  className={`relative rounded-2xl border-3 border-dashed transition-all duration-200 ${
+                    drag 
+                      ? 'border-blue-500 bg-blue-50 scale-[1.02]' 
+                      : 'border-gray-300 hover:border-blue-400'
+                  } ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}
                   onDragEnter={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -434,44 +424,42 @@ export default function NewRequest() {
                   }}
                   onDrop={handleDrop}
                 >
-                  <div className={`w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-blue-100' : 'bg-blue-900/20'
+                  <div className="p-16 text-center">
+                    <div className={`w-32 h-32 rounded-full mx-auto mb-8 flex items-center justify-center ${
+                      theme === 'light' ? 'bg-blue-50' : 'bg-gray-700'
                     }`}>
-                    <svg className={`w-8 h-8 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
+                      <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                      {drag ? "Drop to upload" : "Drag & drop files here"}
+                    </h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-8 text-lg">or click to browse your computer</p>
+                    <label className={`inline-flex items-center px-8 py-4 font-medium rounded-lg cursor-pointer transition-colors text-lg ${
+                      theme === 'light'
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-blue-700 hover:bg-blue-600 text-white'
+                      } hover:shadow-lg`}>
+                      <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                      </svg>
+                      Choose ZIP Files
+                      <input
+                        type="file"
+                        accept=".zip"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => handleFiles(e.target.files)}
+                      />
+                    </label>
+                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-6">Only .zip files are supported</p>
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-400">
-                    {drag ? "Drop files to upload" : "Upload Order Files"}
-                  </h3>
-                  <p className={`mb-6 max-w-md mx-auto text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                    }`}>
-                    Drag and drop your ZIP files here or click the button below
-                  </p>
-                  <p className={`text-xs mb-6 ${theme === 'light' ? 'text-gray-500' : 'text-gray-500'
-                    }`}>
-                    Supported format: .zip only
-                  </p>
-                  <label className={`inline-flex items-center px-6 py-3 font-medium rounded-lg cursor-pointer transition-colors ${theme === 'light'
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-blue-700 hover:bg-blue-600 text-white'
-                    }`}>
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Choose Files
-                    <input
-                      type="file"
-                      accept=".zip"
-                      multiple
-                      className="hidden"
-                      onChange={(e) => handleFiles(e.target.files)}
-                    />
-                  </label>
                 </div>
               </div>
             )}
 
-            {/* Files Table */}
+            {/* Files Table - KEEPING YOUR ORIGINAL CODE */}
             {files.length > 0 && (
               <div className="p-6">
                 {/* Summary Cards */}
