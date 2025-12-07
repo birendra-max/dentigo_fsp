@@ -9,7 +9,7 @@ export default function Login() {
     const navigate = useNavigate();
     const { setUser } = useContext(UserContext);
 
-    const [form, setForm] = useState({ email: "", password: "", remember: false });
+    const [form, setForm] = useState({ userid: "", password: "", remember: false });
     const [status, setStatus] = useState({ type: "", message: "" });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -68,23 +68,23 @@ export default function Login() {
 
                         {/* USERNAME */}
                         <div className="mb-6">
-                            <label className="text-sm mb-1 block">Username</label>
+                            <label className="text-sm mb-1 block font-bold">User Id</label>
                             <div className="relative">
                                 <FontAwesomeIcon icon={faUser} className="absolute left-2 top-3 text-gray-400" />
                                 <input
                                     type="text"
-                                    name="email"
-                                    value={form.email}
+                                    name="userid"
+                                    value={form.userid}
                                     onChange={handleChange}
                                     className="w-full bg-transparent border-b border-white/40 py-2 pl-8 outline-none text-white"
-                                    placeholder="Enter your username"
+                                    placeholder="Enter your userid"
                                 />
                             </div>
                         </div>
 
                         {/* PASSWORD */}
                         <div className="mb-8">
-                            <label className="text-sm mb-1 block">Password</label>
+                            <label className="text-sm mb-1 block font-bold">Password</label>
                             <div className="relative">
                                 <FontAwesomeIcon icon={faLock} className="absolute left-2 top-3 text-gray-400" />
                                 <input

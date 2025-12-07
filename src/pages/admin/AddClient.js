@@ -30,7 +30,7 @@ export default function AllClients() {
     });
 
     const columns = [
-        { header: "Client Id", accessor: "userid" },
+        { header: "Client Id", accessor: "client_id" },
         { header: "Name", accessor: "name" },
         { header: "Designation", accessor: "designation" },
         { header: "Email", accessor: "email" },
