@@ -16,10 +16,17 @@ import {
     faSortDown
 } from '@fortawesome/free-solid-svg-icons';
 
+// Helper function to check if text is long (more than 50 characters)
+const isLongText = (text) => {
+    return text && text.toString().length > 50;
+};
+
 export default function Datatable({
     columns = [],
     data = [],
     rowsPerPageOptions = [50, 100, 200, 500],
+    loading = false,
+    error = null
 }) {
     const { theme } = useContext(ThemeContext);
     const [status, setStatus] = useState("show");
@@ -32,6 +39,15 @@ export default function Datatable({
     // ✅ NEW STATES for multi-select & dropdown
     const [selectedRows, setSelectedRows] = useState([]);
     const [fileType, setFileType] = useState("initial");
+
+    // ✅ Control loader based on parent's loading prop
+    useEffect(() => {
+        if (!loading) {
+            setStatus("hide");
+        } else {
+            setStatus("show");
+        }
+    }, [loading]);
 
     // Filter & Sort
     const filteredData = useMemo(() => {
@@ -78,13 +94,6 @@ export default function Datatable({
         const start = (currentPage - 1) * rowsPerPage;
         return filteredData.slice(start, start + rowsPerPage);
     }, [currentPage, filteredData, rowsPerPage]);
-
-    // ✅ Spinner control: hide loader once data is ready
-    useEffect(() => {
-        if (data && data.length > 0) {
-            setStatus("hide");
-        }
-    }, [data]);
 
     const handleSearch = (e) => {
         setSearch(e.target.value);
@@ -138,8 +147,8 @@ export default function Datatable({
     // Theme-based styling functions
     const getBackgroundClass = () => {
         return theme === 'dark'
-            ? 'bg-gray-900 text-white mt-4'
-            : 'bg-gradient-to-br from-teal-50 via-pink-50 to-cyan-50 text-gray-800 mt-4';
+            ? 'bg-gray-900 mt-8'
+            : 'bg-gradient-to-br from-teal-50 via-pink-50 to-cyan-50 mt-8';
     };
 
     const getTableHeaderClass = () => {
@@ -350,7 +359,7 @@ export default function Datatable({
                             {/* Table Container */}
                             <div className="rounded-sm overflow-hidden shadow-lg">
                                 <div className="overflow-x-auto">
-                                    <table className="w-full border-collapse">
+                                    <table className="w-full border-collapse table-auto">
                                         <thead>
                                             <tr className={getTableHeaderClass()}>
                                                 {/* Checkbox Column */}
@@ -390,7 +399,22 @@ export default function Datatable({
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {paginatedData.length > 0 ? (
+                                            {/* SHOW ERROR OR NO DATA IN TABLE BODY */}
+                                            {error || paginatedData.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={columns.length + 1} className="p-8 text-center">
+                                                        <div className={`flex flex-col items-center justify-center p-8 rounded-lg ${getNoDataClass()}`}>
+                                                            <FontAwesomeIcon icon={faFolderOpen} size="3x" className="mb-4 text-blue-500 opacity-60" />
+                                                            <p className="text-lg font-medium mb-2">
+                                                                {error ? "No data found" : "No records found"}
+                                                            </p>
+                                                            <p className="text-sm opacity-75">
+                                                                {error || (data.length === 0 ? "No data available" : "Try adjusting your search criteria")}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ) : (
                                                 paginatedData.map((row, idx) => (
                                                     <tr key={idx} className={`${getTableRowClass(idx)} transition-colors duration-200`}>
                                                         {/* Checkbox Cell */}
@@ -406,7 +430,11 @@ export default function Datatable({
                                                         {columns.map((col) => (
                                                             <td
                                                                 key={col.accessor}
-                                                                className="p-4 text-[12px] border-r border-gray-300/30 dark:border-gray-600/30 last:border-r-0"
+                                                                className={`p-4 text-[12px] border-r border-gray-300/30 dark:border-gray-600/30 last:border-r-0 
+                                                                    ${col.header === 'Order Id' || col.header === 'Message' || col.header === 'Status' 
+                                                                        ? 'text-center align-middle' 
+                                                                        : 'align-top'
+                                                                    }`}
                                                             >
                                                                 {col.header === 'Order Id' ? (
                                                                     <div>
@@ -426,7 +454,7 @@ export default function Datatable({
                                                                                 className="w-9 h-9 cursor-pointer transition-all duration-200 group-hover:scale-110 group-hover:rotate-12"
                                                                                 onClick={() => openPopup(`${row.orderid}`)}
                                                                             />
-                                                                            <span className=" absolute -top-2 -right-2  bg-gradient-to-br from-red-500 via-red-600 to-red-700  text-white text-[12px] font-semibold  rounded-full min-w-[18px] h-[18px]  flex items-center justify-center  shadow-[0_0_8px_rgba(255,0,0,0.6)]ring-2 ring-white/60 backdrop-blur-sm">
+                                                                            <span className="absolute -top-2 -right-2 bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[12px] font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center shadow-[0_0_8px_rgba(255,0,0,0.6)] ring-2 ring-white/60 backdrop-blur-sm">
                                                                                 {row.totalMessages > 99 ? '99+' : row.totalMessages}
                                                                             </span>
                                                                         </div>
@@ -472,7 +500,10 @@ export default function Datatable({
                                                                         })()}
                                                                     </div>
                                                                 ) : (
-                                                                    <div className="truncate max-w-xs" title={row[col.accessor] ?? "-"}>
+                                                                    <div 
+                                                                        className={`break-words whitespace-normal ${isLongText(row[col.accessor]) ? 'min-w-[150px] max-w-[250px]' : ''}`}
+                                                                        title={row[col.accessor] ?? "-"}
+                                                                    >
                                                                         {row[col.accessor] ?? "-"}
                                                                     </div>
                                                                 )}
@@ -480,24 +511,14 @@ export default function Datatable({
                                                         ))}
                                                     </tr>
                                                 ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan={columns.length + 1} className="p-8 text-center">
-                                                        <div className={`flex flex-col items-center justify-center p-8 rounded-lg ${getNoDataClass()}`}>
-                                                            <FontAwesomeIcon icon={faFolderOpen} size="3x" className="mb-4 text-blue-500 opacity-60" />
-                                                            <p className="text-lg font-medium mb-2">No records found</p>
-                                                            <p className="text-sm opacity-75">Try adjusting your search criteria</p>
-                                                        </div>
-                                                    </td>
-                                                </tr>
                                             )}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
 
-                            {/* Pagination */}
-                            {paginatedData.length > 0 && (
+                            {/* Pagination - Only show when we have data and no error */}
+                            {!error && paginatedData.length > 0 && (
                                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
                                     <div className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                                         Showing <span className="font-bold">{paginatedData.length}</span> of <span className="font-bold">{filteredData.length}</span> entries
