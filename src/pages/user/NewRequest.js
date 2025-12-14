@@ -182,7 +182,7 @@ export default function NewRequest() {
       // Open and send the request
       xhr.open('POST', `${base_url}/new-orders`);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-      xhr.setRequestHeader('X-Tenant', 'skydent');
+      xhr.setRequestHeader('X-Tenant', 'dentigo');
       xhr.send(formData);
     });
   };
