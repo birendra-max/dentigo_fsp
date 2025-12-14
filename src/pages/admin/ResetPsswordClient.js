@@ -21,7 +21,7 @@ export default function ResetPsswordClient() {
     const base_url = localStorage.getItem("base_url");
 
     const columns = [
-        { header: "Client Id", accessor: "userid" },
+        { header: "Client Id", accessor: "client_id" },
         { header: "Name", accessor: "name" },
         { header: "Email", accessor: "email" },
         { header: "Password", accessor: "password" },

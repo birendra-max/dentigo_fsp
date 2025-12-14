@@ -25,7 +25,7 @@ export default function AllClients() {
         "all": {
             title: "All Clients",
             columns: [
-                { header: "Client ID", accessor: "userid" },
+                { header: "Client ID", accessor: "client_id" },
                 { header: "Name", accessor: "name" },
                 { header: "Designation", accessor: "designation" },
                 { header: "Email", accessor: "email" },
@@ -39,7 +39,7 @@ export default function AllClients() {
         "active": {
             title: "Active Clients",
             columns: [
-                { header: "Client ID", accessor: "userid" },
+                { header: "Client ID", accessor: "client_id" },
                 { header: "Name", accessor: "name" },
                 { header: "Designation", accessor: "designation" },
                 { header: "Email", accessor: "email" },
@@ -53,7 +53,7 @@ export default function AllClients() {
         "inactive": {
             title: "Inactive Clients",
             columns: [
-                { header: "Client ID", accessor: "userid" },
+                { header: "Client ID", accessor: "client_id" },
                 { header: "Name", accessor: "name" },
                 { header: "Designation", accessor: "designation" },
                 { header: "Email", accessor: "email" },
