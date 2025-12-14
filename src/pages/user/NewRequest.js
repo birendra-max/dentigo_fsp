@@ -4,40 +4,22 @@ import Foot from "./Foot";
 import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../Context/ThemeContext";
 import { UserContext } from "../../Context/UserContext";
-import { fetchWithAuth } from '../../utils/userapi'
+import { fetchWithAuth } from '../../utils/userapi';
+import axios from "axios";
+
 
 export default function NewRequest() {
   let base_url = localStorage.getItem('base_url');
   const { theme } = useContext(ThemeContext);
-  const { logout } = useContext(UserContext);
+  const { user, logout } = useContext(UserContext);
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [drag, setDragActive] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState("");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-  const handleFiles = async (selectedFiles) => {
-    const fileArray = Array.from(selectedFiles);
-    const zipFiles = fileArray.filter((file) => file.name.endsWith(".zip"));
-
-    if (zipFiles.length !== fileArray.length) {
-      setFiles(prev => [...prev, {
-        fileName: "Invalid files detected",
-        progress: 0,
-        uploadStatus: "Error",
-        orderId: "-",
-        productType: "-",
-        unit: "-",
-        tooth: "-",
-        message: "Only .zip files are allowed!",
-        isError: true
-      }]);
-
-      setTimeout(() => {
-        setFiles(prev => prev.filter(f => !f.isError));
-      }, 3000);
-      return;
-    }
+  const handleFiles = (selectedFiles) => {
+    const zipFiles = Array.from(selectedFiles).filter(f => f.name.endsWith(".zip"));
 
     zipFiles.forEach((file) => {
       setFiles((prev) => [
@@ -51,12 +33,14 @@ export default function NewRequest() {
           unit: "-",
           tooth: "-",
           message: "",
-          file: file,
-        },
+          file: file
+        }
       ]);
+
       uploadFile(file);
     });
   };
+
   const token = localStorage.getItem('token');
 
   const uploadFile = async (file) => {
@@ -85,100 +69,123 @@ export default function NewRequest() {
       console.error("File check error:", err);
     }
 
-    // 2️⃣ Existing code continues...
-    const fileKey = file.name + "_" + Date.now();
-    let completed = false;
-    let progressValue = 0;
+    // 2️⃣ Upload with real progress tracking using XMLHttpRequest
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("userid", user.userid);
+      formData.append("labname", user.labname);
 
-    const intervalId = setInterval(() => {
-      if (!completed && progressValue < 99) {
-        progressValue += Math.random() * 1.8 + 0.4;
-        if (progressValue > 99) progressValue = 99;
+      const xhr = new XMLHttpRequest();
 
-        setFiles((prev) =>
-          prev.map((f) =>
-            f.fileName === file.name
-              ? { ...f, progress: progressValue, uploadStatus: `Uploading... ${Math.floor(progressValue)}%` }
-              : f
-          )
-        );
-      }
-    }, 120);
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch(`${base_url}/new-orders`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "X-Tenant": "dentigo",
-        },
-        body: formData,
-      });
-
-      const result = await response.json();
-      completed = true;
-
-      const finishInterval = setInterval(() => {
-        progressValue += 2;
-
-        if (progressValue >= 100) {
-          progressValue = 100;
-          clearInterval(finishInterval);
-          clearInterval(intervalId);
-
+      // Track upload progress
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
           setFiles((prev) =>
             prev.map((f) =>
               f.fileName === file.name
                 ? {
                   ...f,
-                  progress: 100,
-                  uploadStatus: "Success",
-                  orderId: result.id,
-                  productType: result.product_type,
-                  unit: result.unit,
-                  tooth: result.tooth,
-                  message: result.message
+                  progress: percentComplete,
+                  uploadStatus: `Uploading... ${percentComplete}%`
                 }
                 : f
             )
           );
+        }
+      });
+
+      // Handle load completion
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const result = JSON.parse(xhr.responseText);
+            setFiles((prev) =>
+              prev.map((f) =>
+                f.fileName === file.name
+                  ? {
+                    ...f,
+                    progress: 100,
+                    uploadStatus: "Success",
+                    orderId: result.id,
+                    productType: result.product_type,
+                    unit: result.unit,
+                    tooth: result.tooth,
+                    message: result.message
+                  }
+                  : f
+              )
+            );
+            resolve(result);
+          } catch (error) {
+            setFiles((prev) =>
+              prev.map((f) =>
+                f.fileName === file.name
+                  ? {
+                    ...f,
+                    progress: 100,
+                    uploadStatus: "Failed",
+                    message: "Invalid response from server"
+                  }
+                  : f
+              )
+            );
+            reject(new Error('Invalid response from server'));
+          }
         } else {
           setFiles((prev) =>
             prev.map((f) =>
               f.fileName === file.name
                 ? {
                   ...f,
-                  progress: progressValue,
-                  uploadStatus: `Uploading... ${Math.floor(progressValue)}%`
+                  progress: 100,
+                  uploadStatus: "Failed",
+                  message: `Server error: ${xhr.status}`
                 }
                 : f
             )
           );
+          reject(new Error(`Server error: ${xhr.status}`));
         }
-      }, 40);
+      });
 
-    } catch (error) {
-      completed = true;
-      clearInterval(intervalId);
+      // Handle network errors
+      xhr.addEventListener('error', () => {
+        setFiles((prev) =>
+          prev.map((f) =>
+            f.fileName === file.name
+              ? {
+                ...f,
+                progress: 100,
+                uploadStatus: "Failed",
+                message: "Network error - upload failed"
+              }
+              : f
+          )
+        );
+        reject(new Error('Network error'));
+      });
 
-      setFiles((prev) =>
-        prev.map((f) =>
-          f.fileName === file.name
-            ? {
-              ...f,
-              progress: 100,
-              uploadStatus: "Failed",
-              message: error.message
-            }
-            : f
-        )
-      );
-    }
+      // Handle upload cancellation
+      xhr.addEventListener('abort', () => {
+        setFiles((prev) =>
+          prev.map((f) =>
+            f.fileName === file.name
+              ? { ...f, uploadStatus: "Cancelled", progress: 0 }
+              : f
+          )
+        );
+        reject(new Error('Upload cancelled'));
+      });
+
+      // Open and send the request
+      xhr.open('POST', `${base_url}/new-orders`);
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.setRequestHeader('X-Tenant', 'skydent');
+      xhr.send(formData);
+    });
   };
-
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -395,9 +402,9 @@ export default function NewRequest() {
             {files.length === 0 && (
               <div className="p-8">
                 <div
-                  className={`relative rounded-2xl border-3 border-dashed transition-all duration-200 ${drag 
-                      ? 'border-blue-500 bg-blue-50 scale-[1.02]' 
-                      : 'border-gray-300 hover:border-blue-400'} ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}
+                  className={`relative rounded-2xl border-3 border-dashed transition-all duration-200 ${drag
+                    ? 'border-blue-500 bg-blue-50 scale-[1.02]'
+                    : 'border-gray-300 hover:border-blue-400'} ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}
                   onDragEnter={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -425,8 +432,8 @@ export default function NewRequest() {
                     </h3>
                     <p className={`mb-8 text-lg ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>or click to browse your computer</p>
                     <label className={`inline-flex items-center px-8 py-4 font-medium rounded-lg cursor-pointer transition-colors text-lg ${theme === 'light'
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                        : 'bg-blue-700 hover:bg-blue-600 text-white'
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-blue-700 hover:bg-blue-600 text-white'
                       } hover:shadow-lg`}>
                       <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
