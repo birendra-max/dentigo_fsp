@@ -44,7 +44,11 @@ import {
     faFlag,
     faClipboardList,
     faCalendarCheck,
-    faSyncAlt
+    faSyncAlt,
+    faPaperPlane,
+    faSpinner,
+    faCheck,
+    faExclamationTriangle
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function Dashboard() {
@@ -59,6 +63,13 @@ export default function Dashboard() {
         likes: "",
     });
     const [showModal, setShowModal] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState({
+        show: false,
+        type: '', // 'success' or 'error'
+        message: '',
+        icon: null
+    });
 
     const handleChange = (e) => {
         setForm({
@@ -69,11 +80,28 @@ export default function Dashboard() {
 
     const feedBackaRef = useRef(null);
     const token = localStorage.getItem('token');
+    
     const saveFeedback = async () => {
-        if (form.feedback === '') {
+        if (form.feedback.trim() === '') {
             feedBackaRef.current.focus();
+            setSubmitStatus({
+                show: true,
+                type: 'error',
+                message: 'Please enter your feedback before submitting.',
+                icon: faExclamationTriangle
+            });
+            return;
         }
-        else {
+
+        setIsSubmitting(true);
+        setSubmitStatus({
+            show: false,
+            type: '',
+            message: '',
+            icon: null
+        });
+
+        try {
             const resp = await fetch(`${base_url}/save-feedback`, {
                 method: "POST",
                 headers: {
@@ -82,36 +110,114 @@ export default function Dashboard() {
                     'X-Tenant': 'dentigo'
                 },
                 body: JSON.stringify(form),
-            })
+            });
 
-            const data = await resp.json()
+            const data = await resp.json();
+            
             if (data.status === 'success') {
-                const statusEl = document.getElementById('status');
-                statusEl.className = 'mb-4 w-full px-4 py-2 text-sm font-medium border rounded-lg border-green-400 bg-green-100 text-green-700 dark:border-green-500 dark:bg-green-900/30 dark:text-green-400';
-                statusEl.innerText = data.message;
+                setSubmitStatus({
+                    show: true,
+                    type: 'success',
+                    message: data.message || 'Thank you for your valuable feedback!',
+                    icon: faCheck
+                });
+                
                 setForm({ feedback: "", likes: "" });
                 document.getElementById('feedbackform').reset();
+                
+                // Clear star ratings visually
+                const starButtons = document.querySelectorAll('button[onclick^="setForm"]');
+                starButtons.forEach(btn => {
+                    btn.classList.remove('bg-gradient-to-br', 'from-yellow-500', 'to-orange-500');
+                    if (theme === 'dark') {
+                        btn.classList.add('bg-gray-700');
+                    } else {
+                        btn.classList.add('bg-gray-100');
+                    }
+                });
+                
+                // Auto close after success
                 setTimeout(() => {
                     setShowModal(false);
+                    setSubmitStatus({
+                        show: false,
+                        type: '',
+                        message: '',
+                        icon: null
+                    });
+                    setIsSubmitting(false);
                 }, 2000);
-
+                
             } else {
-
                 if (data.error === 'Invalid or expired token') {
-                    alert('Invalid or expired token. Please log in again.')
+                    alert('Invalid or expired token. Please log in again.');
                     navigate(logout);
+                    return;
                 }
 
-                const statusEl = document.getElementById('status');
-                statusEl.className = 'mb-4 w-full px-4 py-2 text-sm font-medium border rounded-lg border-red-400 bg-red-100 text-red-700 dark:border-red-500 dark:bg-red-900/30 dark:text-red-400';
-                statusEl.innerText = data.message;
-                setForm({ feedback: "", likes: "" });
-                document.getElementById('feedbackform').reset();
-                setTimeout(() => {
-                    setShowModal(false);
-                }, 2000);
+                setSubmitStatus({
+                    show: true,
+                    type: 'error',
+                    message: data.message || 'Failed to submit feedback. Please try again.',
+                    icon: faExclamationTriangle
+                });
+                setIsSubmitting(false);
             }
+        } catch (error) {
+            console.error("Error submitting feedback:", error);
+            setSubmitStatus({
+                show: true,
+                type: 'error',
+                message: 'Network error. Please check your connection and try again.',
+                icon: faExclamationTriangle
+            });
+            setIsSubmitting(false);
         }
+    };
+
+    const handleOpenModal = () => {
+        setShowModal(true);
+        setForm({ feedback: "", likes: "" });
+        setSubmitStatus({
+            show: false,
+            type: '',
+            message: '',
+            icon: null
+        });
+        setIsSubmitting(false);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setForm({ feedback: "", likes: "" });
+        setSubmitStatus({
+            show: false,
+            type: '',
+            message: '',
+            icon: null
+        });
+        setIsSubmitting(false);
+    };
+
+    const handleStarClick = (num) => {
+        if (isSubmitting) return;
+        setForm((prev) => ({ ...prev, likes: num }));
+        
+        // Update star visuals
+        const starButtons = document.querySelectorAll('.star-rating-button');
+        starButtons.forEach((btn, index) => {
+            if (index < num) {
+                btn.classList.remove('bg-gray-700', 'bg-gray-100', 'hover:bg-gray-600', 'hover:bg-gray-200');
+                btn.classList.add('bg-gradient-to-br', 'from-yellow-500', 'to-orange-500');
+            } else {
+                btn.classList.remove('bg-gradient-to-br', 'from-yellow-500', 'to-orange-500');
+                if (theme === 'dark') {
+                    btn.classList.add('bg-gray-700');
+                } else {
+                    btn.classList.add('bg-gray-100');
+                }
+            }
+        });
     };
 
     useEffect(() => {
@@ -157,7 +263,7 @@ export default function Dashboard() {
                     subtitle: "Awaiting review",
                     count: cases.new_cases,
                     color: "from-blue-500 to-cyan-500",
-                    icon: faFileAlt,  // Changed from faBox
+                    icon: faFileAlt,
                     accent: "bg-blue-500",
                     priority: "high",
                     iconSize: "text-lg"
@@ -169,7 +275,7 @@ export default function Dashboard() {
                     subtitle: "Currently working",
                     count: cases.progress,
                     color: "from-teal-500 to-emerald-500",
-                    icon: faHourglassHalf,  // Changed from faClock
+                    icon: faHourglassHalf,
                     accent: "bg-teal-500",
                     priority: "medium",
                     iconSize: "text-lg"
@@ -181,7 +287,7 @@ export default function Dashboard() {
                     subtitle: "Ready for delivery",
                     count: cases.completed,
                     color: "from-green-500 to-lime-500",
-                    icon: faCheckCircle,  // Changed from faCheckDouble
+                    icon: faCheckCircle,
                     accent: "bg-green-500",
                     priority: "low",
                     iconSize: "text-lg"
@@ -193,7 +299,7 @@ export default function Dashboard() {
                     subtitle: "High priority",
                     count: cases.rush,
                     color: "from-red-500 to-pink-500",
-                    icon: faFlag,  // Changed from faRunning
+                    icon: faFlag,
                     accent: "bg-red-500",
                     priority: "high",
                     iconSize: "text-lg"
@@ -205,7 +311,7 @@ export default function Dashboard() {
                     subtitle: "Quality check",
                     count: cases.qc,
                     color: "from-purple-500 to-violet-500",
-                    icon: faClipboardList,  // Changed from faClipboardCheck
+                    icon: faClipboardList,
                     accent: "bg-purple-500",
                     priority: "medium",
                     iconSize: "text-lg"
@@ -217,7 +323,7 @@ export default function Dashboard() {
                     subtitle: "Pending information",
                     count: cases.hold,
                     color: "from-gray-500 to-slate-500",
-                    icon: faPauseCircle,  // Changed from faHandPaper
+                    icon: faPauseCircle,
                     accent: "bg-gray-500",
                     priority: "medium",
                     iconSize: "text-lg"
@@ -229,7 +335,7 @@ export default function Dashboard() {
                     subtitle: "Terminated cases",
                     count: cases.canceled,
                     color: "from-rose-500 to-red-500",
-                    icon: faExclamationCircle,  // Changed from faBan
+                    icon: faExclamationCircle,
                     accent: "bg-rose-500",
                     priority: "low",
                     iconSize: "text-lg"
@@ -241,7 +347,7 @@ export default function Dashboard() {
                     subtitle: "Total overview",
                     count: cases.all,
                     color: "from-indigo-500 to-blue-600",
-                    icon: faTasks,  // Changed from faBriefcase
+                    icon: faTasks,
                     accent: "bg-indigo-500",
                     priority: "low",
                     iconSize: "text-lg"
@@ -253,7 +359,7 @@ export default function Dashboard() {
                     subtitle: "Previous day",
                     count: cases.yesterday_cases,
                     color: "from-cyan-500 to-sky-500",
-                    icon: faCalendarCheck,  // Changed from faCalendarDay
+                    icon: faCalendarCheck,
                     accent: "bg-cyan-500",
                     priority: "low",
                     iconSize: "text-lg"
@@ -265,7 +371,7 @@ export default function Dashboard() {
                     subtitle: "This week",
                     count: cases.weekly_cases,
                     color: "from-fuchsia-500 to-pink-500",
-                    icon: faCalendar,  // Changed from faCalendarWeek
+                    icon: faCalendar,
                     accent: "bg-fuchsia-500",
                     priority: "medium",
                     iconSize: "text-lg"
@@ -277,7 +383,7 @@ export default function Dashboard() {
                     subtitle: "Revision needed",
                     count: cases.redesign_cases,
                     color: "from-emerald-500 to-teal-500",
-                    icon: faSyncAlt,  // Changed from faRedo
+                    icon: faSyncAlt,
                     accent: "bg-emerald-500",
                     priority: "medium",
                     iconSize: "text-lg"
@@ -287,14 +393,6 @@ export default function Dashboard() {
             setCards(updatedCards);
         }
     }, [cases]);
-
-    const handleOpenModal = () => {
-        setShowModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
 
     // Theme-based classes
     const getBackgroundClass = () => {
@@ -342,7 +440,32 @@ export default function Dashboard() {
         }
     };
 
-    if (cards && cards != null) {
+    const getStatusColorClass = (type) => {
+        if (type === 'success') {
+            return theme === 'dark' 
+                ? 'bg-green-900/30 border border-green-800 text-green-300' 
+                : 'bg-green-50 border border-green-200 text-green-700';
+        } else if (type === 'error') {
+            return theme === 'dark' 
+                ? 'bg-red-900/30 border border-red-800 text-red-300' 
+                : 'bg-red-50 border border-red-200 text-red-700';
+        }
+        return '';
+    };
+
+    const getSubmitButtonClass = () => {
+        const baseClass = "flex-1 px-3 py-2.5 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2";
+        
+        if (isSubmitting) {
+            return theme === 'dark'
+                ? `${baseClass} bg-blue-800/50 text-blue-300 cursor-not-allowed`
+                : `${baseClass} bg-blue-400 text-white cursor-not-allowed`;
+        }
+        
+        return `${baseClass} bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-sm`;
+    };
+
+    if (cards && cards.length > 0) {
         return (
             <section className={`p-4 md:p-6 ${getBackgroundClass()}`}>
                 {/* Cards Grid - Professional Compact Design */}
@@ -432,131 +555,186 @@ export default function Dashboard() {
                     ))}
                 </div>
 
-                {/* Feedback Modal - Clean Professional Design */}
+                {/* Feedback Modal - Enhanced Professional Design */}
                 {showModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        {/* Backdrop */}
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+                        {/* Backdrop with blur */}
                         <div
-                            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-                            onClick={handleCloseModal}
+                            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-all duration-300"
+                            onClick={!isSubmitting ? handleCloseModal : undefined}
                         ></div>
 
                         {/* Modal Container */}
-                        <div className={`relative w-full max-w-md rounded-xl shadow-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+                        <div className={`relative w-full max-w-md rounded-xl shadow-2xl transform transition-all duration-300 scale-100 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className="p-5">
                                 {/* Header */}
                                 <div className="flex items-center justify-between mb-5">
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-9 h-9 rounded-lg ${theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-100'} flex items-center justify-center`}>
-                                            <FontAwesomeIcon icon={faLightbulb} className={theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} />
+                                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${theme === 'dark' ? 'bg-gradient-to-br from-blue-500/20 to-indigo-500/20' : 'bg-gradient-to-br from-blue-100 to-indigo-100'}`}>
+                                            <FontAwesomeIcon 
+                                                icon={faLightbulb} 
+                                                className={theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} 
+                                            />
                                         </div>
                                         <div>
                                             <h3 className={`text-base font-semibold ${getTitleClass()}`}>
-                                                Share Feedback
+                                                Share Your Feedback
                                             </h3>
                                             <p className={`text-xs ${getSubtitleClass()}`}>
-                                                Help us improve your experience
+                                                We value your opinion
                                             </p>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={handleCloseModal}
-                                        className={`w-7 h-7 rounded-full flex items-center justify-center ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
-                                    >
-                                        <FontAwesomeIcon icon={faXmark} className={getSubtitleClass()} />
-                                    </button>
+                                    {!isSubmitting && (
+                                        <button
+                                            onClick={handleCloseModal}
+                                            className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                                            disabled={isSubmitting}
+                                        >
+                                            <FontAwesomeIcon icon={faXmark} className={getSubtitleClass()} />
+                                        </button>
+                                    )}
                                 </div>
 
-                                {/* Status message */}
-                                <p id="status" className="mb-4 text-xs"></p>
+                                {/* Status Message - Professional Design */}
+                                {submitStatus.show && (
+                                    <div className={`mb-4 p-3.5 rounded-lg flex items-center gap-3 transition-all duration-300 ${getStatusColorClass(submitStatus.type)} animate-slide-down`}>
+                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center ${submitStatus.type === 'success' 
+                                            ? theme === 'dark' ? 'bg-green-500/20' : 'bg-green-100' 
+                                            : theme === 'dark' ? 'bg-red-500/20' : 'bg-red-100'}`}>
+                                            <FontAwesomeIcon 
+                                                icon={submitStatus.icon} 
+                                                className={submitStatus.type === 'success' 
+                                                    ? theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                                                    : theme === 'dark' ? 'text-red-400' : 'text-red-600'
+                                                } 
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-sm font-medium leading-tight">{submitStatus.message}</p>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Form */}
                                 <form className="space-y-5" id="feedbackform">
                                     {/* Feedback textarea */}
-                                    <div>
-                                        <label className={`block mb-2 text-xs font-medium ${getTitleClass()}`}>
-                                            Your Feedback
+                                    <div className="space-y-2">
+                                        <label className={`block text-xs font-semibold ${getTitleClass()}`}>
+                                            Your Feedback <span className="text-red-500">*</span>
                                         </label>
                                         <textarea
                                             ref={feedBackaRef}
-                                            rows="3"
+                                            rows="4"
                                             name="feedback"
                                             value={form.feedback}
                                             onChange={handleChange}
-                                            className={`w-full px-3 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-sm transition-all ${theme === 'dark'
-                                                ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400'
-                                                : 'bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-500'
+                                            disabled={isSubmitting}
+                                            className={`w-full px-3.5 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-sm resize-none ${theme === 'dark'
+                                                ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed'
+                                                : 'bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-500 disabled:opacity-50 disabled:cursor-not-allowed'
                                                 }`}
-                                            placeholder="What can we improve?"
+                                            placeholder="What do you like about our service? What can we improve?"
                                         ></textarea>
+                                        <div className="flex justify-between items-center">
+                                            <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                Minimum 10 characters recommended
+                                            </p>
+                                            <p className={`text-xs ${form.feedback.length < 10 ? 'text-amber-500' : 'text-green-500'}`}>
+                                                {form.feedback.length}/500
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    {/* Star Rating */}
-                                    <div>
-                                        <label className={`block mb-3 text-xs font-medium ${getTitleClass()}`}>
-                                            Rate Your Experience
+                                    {/* Star Rating - Enhanced */}
+                                    <div className="space-y-3">
+                                        <label className={`block text-xs font-semibold ${getTitleClass()}`}>
+                                            How would you rate your experience?
                                         </label>
-                                        <div className="flex items-center justify-center space-x-2">
+                                        <div className="flex items-center justify-center space-x-1.5 mb-2">
                                             {[1, 2, 3, 4, 5].map((num) => (
                                                 <button
                                                     key={num}
                                                     type="button"
-                                                    onClick={() => setForm((prev) => ({ ...prev, likes: num }))}
-                                                    className="group relative"
-                                                >
-                                                    <div className={`
-                                                        w-9 h-9 flex items-center justify-center rounded-lg
-                                                        transition-all duration-200
+                                                    onClick={() => !isSubmitting && handleStarClick(num)}
+                                                    disabled={isSubmitting}
+                                                    className={`
+                                                        star-rating-button
+                                                        w-10 h-10 flex items-center justify-center rounded-lg
+                                                        transition-all duration-200 transform hover:scale-110
                                                         ${form.likes >= num
-                                                            ? 'bg-gradient-to-br from-yellow-500 to-orange-500'
+                                                            ? 'bg-gradient-to-br from-yellow-500 to-orange-500 shadow-md'
                                                             : theme === 'dark'
                                                                 ? 'bg-gray-700 hover:bg-gray-600'
                                                                 : 'bg-gray-100 hover:bg-gray-200'
                                                         }
-                                                    `}>
-                                                        <FontAwesomeIcon
-                                                            icon={faStar}
-                                                            className={`text-sm ${form.likes >= num ? 'text-white' : theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`}
-                                                        />
-                                                    </div>
-                                                    <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded bg-gray-800 text-white whitespace-nowrap">
-                                                        {num}
+                                                        ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                                                        group relative
+                                                    `}
+                                                >
+                                                    <FontAwesomeIcon
+                                                        icon={faStar}
+                                                        className={`text-sm ${form.likes >= num ? 'text-white' : theme === 'dark' ? 'text-gray-400 group-hover:text-yellow-400' : 'text-gray-400 group-hover:text-yellow-500'}`}
+                                                    />
+                                                    <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs px-2 py-1 rounded-md bg-gray-900 text-white whitespace-nowrap shadow-lg">
+                                                        {num === 1 ? 'Poor'
+                                                            : num === 2 ? 'Fair'
+                                                                : num === 3 ? 'Good'
+                                                                    : num === 4 ? 'Very Good'
+                                                                        : 'Excellent'}
                                                     </span>
                                                 </button>
                                             ))}
                                         </div>
 
+                                        {/* Rating Description */}
                                         {form.likes > 0 && (
-                                            <div className={`mt-3 p-2.5 rounded-lg text-center ${theme === 'dark' ? 'bg-yellow-500/10 border border-yellow-500/20' : 'bg-yellow-50 border border-yellow-100'}`}>
-                                                <p className={`text-xs font-medium ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'}`}>
-                                                    {form.likes === 1 ? '⭐ Needs Improvement'
-                                                        : form.likes === 2 ? '⭐⭐ Fair'
-                                                            : form.likes === 3 ? '⭐⭐⭐ Good'
-                                                                : form.likes === 4 ? '⭐⭐⭐⭐ Very Good'
-                                                                    : '⭐⭐⭐⭐⭐ Excellent'}
+                                            <div className={`p-3 rounded-lg text-center ${theme === 'dark' ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20' : 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-100'}`}>
+                                                <p className={`text-xs font-semibold ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'}`}>
+                                                    {form.likes === 1 ? '😞 Needs Improvement'
+                                                        : form.likes === 2 ? '😕 Fair - Room for improvement'
+                                                            : form.likes === 3 ? '🙂 Good - Met expectations'
+                                                                : form.likes === 4 ? '😊 Very Good - Exceeded expectations'
+                                                                    : '🤩 Excellent - Outstanding experience!'}
                                                 </p>
                                             </div>
                                         )}
                                     </div>
 
                                     {/* Action buttons */}
-                                    <div className="flex gap-3 pt-2">
+                                    <div className="flex gap-3 pt-3">
                                         <button
                                             type="button"
                                             onClick={handleCloseModal}
-                                            className={`flex-1 px-3 py-2.5 rounded-lg font-medium transition-all text-sm ${theme === 'dark'
-                                                ? 'bg-gray-700 hover:bg-gray-600'
-                                                : 'bg-gray-100 hover:bg-gray-200'
-                                                } ${getTitleClass()}`}
+                                            disabled={isSubmitting}
+                                            className={`
+                                                flex-1 px-3 py-2.5 rounded-lg font-medium transition-all text-sm 
+                                                ${theme === 'dark'
+                                                    ? 'bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                                                    : 'bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed'
+                                                }
+                                                ${getTitleClass()}
+                                            `}
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="button"
                                             onClick={saveFeedback}
-                                            className="flex-1 px-3 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium text-sm shadow-sm"
+                                            disabled={isSubmitting || form.feedback.trim().length < 1}
+                                            className={getSubmitButtonClass()}
                                         >
-                                            Submit
+                                            {isSubmitting ? (
+                                                <>
+                                                    <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+                                                    Submitting...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FontAwesomeIcon icon={faPaperPlane} />
+                                                    Submit Feedback
+                                                </>
+                                            )}
                                         </button>
                                     </div>
                                 </form>
@@ -565,57 +743,93 @@ export default function Dashboard() {
                     </div>
                 )}
 
-                {/* Floating Feedback Button */}
+                {/* Enhanced Floating Feedback Button */}
                 <div className="fixed bottom-6 right-6 z-40">
                     <button
                         onClick={handleOpenModal}
-                        className="group relative cursor-pointer animate-bounce hover:animate-none"
+                        className="group relative cursor-pointer"
+                        disabled={isSubmitting}
                     >
+                        {/* Glow effect */}
+                        <div className={`absolute -inset-2 rounded-full animate-pulse opacity-20 ${theme === 'dark' ? 'bg-blue-500' : 'bg-blue-400'}`}></div>
+                        
                         {/* Main button */}
-                        <div className="relative w-12 h-12 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110 rounded-full overflow-hidden">
-                            {/* Blinking glow ring */}
-                            <div className={`absolute -inset-1 rounded-full animate-ping opacity-20 ${theme === 'dark' ? 'bg-blue-400' : 'bg-blue-500'
-                                }`} style={{ animationDuration: '2s' }}></div>
-
-                            {/* Main gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full"></div>
-
-                            {/* Pulsing border */}
-                            <div className={`absolute inset-0 rounded-full border-2 animate-pulse ${theme === 'dark' ? 'border-blue-400/50' : 'border-blue-300/50'
-                                }`} style={{ animationDuration: '1.5s' }}></div>
-
+                        <div className="relative w-12 h-12 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 rounded-full overflow-hidden group-hover:rotate-6">
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 rounded-full"></div>
+                            
+                            {/* Animated rings */}
+                            <div className="absolute inset-0 rounded-full border-2 border-white/30 animate-ping opacity-20" style={{ animationDuration: '3s' }}></div>
+                            <div className="absolute inset-1 rounded-full border border-white/20 animate-ping opacity-30" style={{ animationDuration: '2s' }}></div>
+                            
                             <div className="relative w-full h-full flex items-center justify-center">
-                                <FontAwesomeIcon
-                                    icon={faHeart}
-                                    className="text-white text-sm group-hover:scale-110 transition-transform duration-200"
-                                />
+                                {isSubmitting ? (
+                                    <FontAwesomeIcon
+                                        icon={faSpinner}
+                                        className="text-white text-sm animate-spin"
+                                    />
+                                ) : (
+                                    <FontAwesomeIcon
+                                        icon={faHeart}
+                                        className="text-white text-sm group-hover:scale-110 transition-transform duration-300"
+                                    />
+                                )}
                             </div>
                         </div>
 
-                        {/* Tooltip */}
-                        <div className="absolute right-full mr-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <div className={`px-2.5 py-1.5 rounded text-xs font-medium whitespace-nowrap shadow-md ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-900 text-white'
-                                }`}>
-                                Feedback
-                                <div className="absolute top-1/2 right-0 transform translate-x-1/2 -translate-y-1/2 rotate-45 w-1.5 h-1.5 bg-inherit"></div>
+                        {/* Enhanced Tooltip */}
+                        <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                            <div className={`px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap shadow-lg ${theme === 'dark' ? 'bg-gray-800 text-white border border-gray-700' : 'bg-gray-900 text-white border border-gray-800'}`}>
+                                Share Feedback
+                                <div className="absolute top-1/2 right-0 transform translate-x-1/2 -translate-y-1/2 rotate-45 w-2 h-2 bg-inherit border-r border-b border-inherit"></div>
                             </div>
                         </div>
                     </button>
                 </div>
+
+                {/* Add CSS animations */}
+                <style jsx>{`
+                    @keyframes fade-in {
+                        from {
+                            opacity: 0;
+                        }
+                        to {
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes slide-down {
+                        from {
+                            transform: translateY(-10px);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateY(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes scale-in {
+                        from {
+                            transform: scale(0.95);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: scale(1);
+                            opacity: 1;
+                        }
+                    }
+                    .animate-fade-in {
+                        animation: fade-in 0.3s ease-out;
+                    }
+                    .animate-slide-down {
+                        animation: slide-down 0.3s ease-out;
+                    }
+                    .animate-scale-in {
+                        animation: scale-in 0.3s ease-out;
+                    }
+                    .animation-delay-300 {
+                        animation-delay: 300ms;
+                    }
+                `}</style>
             </section>
-        )
-    } else {
-        return (
-            <div className={`min-h-screen flex items-center justify-center ${getBackgroundClass()}`}>
-                <div className="text-center">
-                    <div className="relative inline-block">
-                        <div className="w-16 h-16 border-4 border-transparent border-t-blue-500 border-r-purple-500 rounded-full animate-spin"></div>
-                        <div className="absolute inset-4 border-4 border-transparent border-b-green-500 border-l-yellow-500 rounded-full animate-spin animation-delay-300"></div>
-                    </div>
-                    <p className={`mt-6 text-lg font-medium ${getTitleClass()}`}>Loading Dashboard...</p>
-                    <p className={`mt-2 text-sm ${getSubtitleClass()}`}>Please wait while we load your data</p>
-                </div>
-            </div>
         )
     }
 }
