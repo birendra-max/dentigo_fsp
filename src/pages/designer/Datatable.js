@@ -8,12 +8,12 @@ import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { fetchWithAuth } from '../../utils/designerapi';
 import { Link } from 'react-router-dom';
 import {
-    faRepeat,
     faFolderOpen,
     faSearch,
     faSort,
     faSortUp,
-    faSortDown
+    faSortDown,
+    faBolt
 } from '@fortawesome/free-solid-svg-icons';
 
 // Helper function to check if text is long (more than 50 characters)
