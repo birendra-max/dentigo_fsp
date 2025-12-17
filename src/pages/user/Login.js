@@ -4,7 +4,7 @@ import { faEye, faEyeSlash, faUser, faLock } from "@fortawesome/free-solid-svg-i
 import { UserContext } from "../../Context/UserContext";
 import { useNavigate } from "react-router-dom";
 import config from "../../config";
-
+import {Link} from 'react-router-dom';
 export default function Login() {
     const navigate = useNavigate();
     const { setUser } = useContext(UserContext);
@@ -124,7 +124,7 @@ export default function Login() {
 
                         <p className="text-left text-sm text-gray-300">
                             Don’t have an account?
-                            <span className="text-cyan-400 ml-1 cursor-pointer">Sign Up</span>
+                            <Link to="/user/register" className="text-cyan-400 ml-1 cursor-pointer">Sign Up</Link>
                         </p>
                     </div>
                 </div>
