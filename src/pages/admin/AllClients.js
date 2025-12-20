@@ -18,6 +18,8 @@ export default function AllClients() {
     const [showPassword, setShowPassword] = useState(false);
     const [message, setMessage] = useState({ text: "", type: "" });
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
     // ============================
     // 📌 Dynamic Config Based on ID (CLIENT ONLY)
     // ============================
@@ -25,7 +27,7 @@ export default function AllClients() {
         "all": {
             title: "All Clients",
             columns: [
-                { header: "Client ID", accessor: "client_id" },
+                { header: "Client ID", accessor: "userid" },
                 { header: "Name", accessor: "name" },
                 { header: "Designation", accessor: "designation" },
                 { header: "Email", accessor: "email" },
@@ -39,7 +41,7 @@ export default function AllClients() {
         "active": {
             title: "Active Clients",
             columns: [
-                { header: "Client ID", accessor: "client_id" },
+                { header: "Client ID", accessor: "userid" },
                 { header: "Name", accessor: "name" },
                 { header: "Designation", accessor: "designation" },
                 { header: "Email", accessor: "email" },
@@ -53,7 +55,7 @@ export default function AllClients() {
         "inactive": {
             title: "Inactive Clients",
             columns: [
-                { header: "Client ID", accessor: "client_id" },
+                { header: "Client ID", accessor: "userid" },
                 { header: "Name", accessor: "name" },
                 { header: "Designation", accessor: "designation" },
                 { header: "Email", accessor: "email" },
@@ -73,16 +75,21 @@ export default function AllClients() {
     useEffect(() => {
         async function loadData() {
             try {
+                setLoading(true);
+                setError(null);
                 const res = await fetchWithAuth(`/fetch-client-info/${id}`);
 
                 if (res && res.status === "success") {
                     setData(res.data || []);
                 } else {
                     setData([]);
+                    setError("No data found ! in the server")
                 }
-            } catch (e) {
-                console.error("API Error:", e);
+            } catch (error) {
                 setData([]);
+                setError("Network error. Please check your connection.");
+            } finally {
+                setLoading(false);
             }
         }
 
@@ -228,6 +235,7 @@ export default function AllClients() {
                         columns={config?.columns || []}
                         data={data}
                         rowsPerPage={50}
+                        loading={loading} error={error}
                     />
                 </div>
             </main>

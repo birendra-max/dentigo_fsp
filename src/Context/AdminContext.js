@@ -5,7 +5,7 @@ export const AdminContext = createContext();
 
 export const AdminProvider = ({ children }) => {
     const [admin, setAdmin] = useState(() => {
-        const storedAdmin = localStorage.getItem('admin');
+        const storedAdmin = localStorage.getItem('dentigo_admin');
         return storedAdmin ? JSON.parse(storedAdmin) : null;
     });
 
@@ -13,18 +13,17 @@ export const AdminProvider = ({ children }) => {
 
     useEffect(() => {
         if (admin) {
-            localStorage.setItem('admin', JSON.stringify(admin));
+            localStorage.setItem('dentigo_admin', JSON.stringify(admin));
         } else {
-            localStorage.removeItem('admin');
+            localStorage.removeItem('dentigo_admin');
         }
     }, [admin]);
 
     const logout = async () => {
         setAdmin(null);
-        localStorage.removeItem('admin');
-        localStorage.removeItem('token');
+        localStorage.removeItem('dentigo_admin');
+        localStorage.removeItem('dentigo_admin_token');
         localStorage.removeItem('theme');
-        localStorage.removeItem('base_url');
         navigate('/admin', { replace: true });
     }
 
