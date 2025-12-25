@@ -119,8 +119,8 @@ export default function Hd() {
 
     const navItems = [
         { href: "/admin/dashboard", label: "Dashboard", key: "index", icon: faGaugeHigh },
-        { href: "/admin/new_request", label: "File Upload", key: "new_request", icon: faUpload },
-        { href: "/admin/multisearch", label: "Multi Search", key: "multisearch", icon: faSearch },
+        { href: "/admin/new_request", label: "File Upload Center", key: "new_request", icon: faUpload },
+        { href: "/admin/multisearch", label: "Advanced Filters Orders", key: "multisearch", icon: faSearch },
         { href: "/admin/cases-reports", label: "Reports", key: "reports", icon: faChartBar }
     ];
     
@@ -135,7 +135,7 @@ export default function Hd() {
                     <img
                         src="/img/logo.png"
                         alt="Logo"
-                        className="h-10 sm:h-16 w-auto rounded-lg hover:scale-105 transition-transform"
+                        className="h-10 sm:h-13 w-auto rounded-lg hover:scale-105 transition-transform"
                         onError={(e) => (e.target.src = "/img/placeholder-logo.png")}
                     />
                     {/* --- Center Welcome Text --- */}
