@@ -15,8 +15,8 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
-        const d = localStorage.getItem("designer");
-        const token = localStorage.getItem("token");
+        const d = localStorage.getItem("dentigo_designer");
+        const token = localStorage.getItem("dentigo_designer_token");
         if (d && token) navigate("/designer/home");
     }, [navigate]);
 
@@ -36,9 +36,9 @@ export default function Login() {
 
             const data = await res.json();
             if (data.status === "success" && data.designer?.desiid) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("designer", JSON.stringify(data.designer));
-                localStorage.setItem("base_url", data.base_url);
+                localStorage.setItem("dentigo_designer_token", data.token);
+                localStorage.setItem("dentigo_designer", JSON.stringify(data.designer));
+                localStorage.setItem("dentigo_designer_base_url", data.base_url);
                 setDesigner(data.designer);
                 navigate("/designer/home");
             } else {

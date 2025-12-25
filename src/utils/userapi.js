@@ -3,8 +3,8 @@ import { logoutUser } from "./userauth";
 let isLoggingOut = false; // 🔒 Prevent multiple logouts overlapping
 
 export async function fetchWithAuth(endpoint, options = {}) {
-    let token = localStorage.getItem("token");
-    let base_url = localStorage.getItem('base_url');
+    let token = localStorage.getItem("dentigo_user_token");
+    let base_url = localStorage.getItem('dentigo_user_base_url');
 
     // 🛡️ Ensure token is valid before using it
     if (!token || token === "null" || token === "undefined" || token.trim() === "") {

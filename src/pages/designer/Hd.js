@@ -32,8 +32,8 @@ export default function Hd() {
 
     // Authentication check
     useEffect(() => {
-        const data = localStorage.getItem('designer');
-        const token = localStorage.getItem('token');
+        const data = localStorage.getItem('dentigo_designer');
+        const token = localStorage.getItem('dentigo_designer_token');
 
         if (!data || !token) {
             navigate('/designer');

@@ -32,7 +32,7 @@ import { UserContext } from "../../Context/UserContext";
 import { DesignerContext } from "../../Context/DesignerContext";
 
 function Chatbox({ orderid, theme }) {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('dentigo_designer_token');
     const userCtx = useContext(UserContext);
     const designerCtx = useContext(DesignerContext);
     let userRole = null;
@@ -278,9 +278,9 @@ function Chatbox({ orderid, theme }) {
                     <div>
                         <h3 className={`font-bold ${theme === "light" ? "text-gray-900" : "text-white"}`}>Order Chat</h3>
                         <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`} />
+                            <div className={`w-2 h-2 rounded-full bg-green-500`} />
                             <span className={`text-xs ${theme === "light" ? "text-gray-600" : "text-gray-400"}`}>
-                                {isConnected ? "Connected" : "Connecting..."}
+                                Connected
                             </span>
                         </div>
                     </div>
@@ -374,8 +374,8 @@ export default function OrderDetails() {
     const [designPreferences, setDesignPreferences] = useState(null);
     const [preferencesLoading, setPreferencesLoading] = useState(false);
     const navigate = useNavigate();
-    const base_url = localStorage.getItem("base_url");
-    const token = localStorage.getItem("token");
+    const base_url = localStorage.getItem("dentigo_designer_base_url");
+    const token = localStorage.getItem("dentigo_designer_token");
     const fileInputRef = useRef(null);
 
     useEffect(() => {

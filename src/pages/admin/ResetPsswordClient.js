@@ -18,8 +18,8 @@ export default function ResetPsswordClient() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const token = localStorage.getItem("token");
-    const base_url = localStorage.getItem("base_url");
+    const token = localStorage.getItem("dentigo_admin_token");
+    const base_url = localStorage.getItem("dentigo_admin_base_url");
 
     const columns = [
         { header: "Client Id", accessor: "userid" },

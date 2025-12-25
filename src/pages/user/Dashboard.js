@@ -52,7 +52,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function Dashboard() {
-    const base_url = localStorage.getItem('base_url');
+    const base_url = localStorage.getItem('dentigo_user_base_url');
     const navigate = useNavigate();
     const { logout } = useContext(UserContext);
     const { theme } = useContext(ThemeContext);
@@ -79,7 +79,7 @@ export default function Dashboard() {
     };
 
     const feedBackaRef = useRef(null);
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('dentigo_user_token');
     
     const saveFeedback = async () => {
         if (form.feedback.trim() === '') {

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useContext } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faUser, faTimes, faFile, faPaperclip, faPaperPlane, faDownload,
-    faCrown, faShieldAlt, faUserTie
+    faCrown, faUserTie
 } from "@fortawesome/free-solid-svg-icons";
 import { UserContext } from '../Context/UserContext';
 import { DesignerContext } from '../Context/DesignerContext';
@@ -10,9 +10,9 @@ import { AdminContext } from '../Context/AdminContext';
 import config from '../config';
 
 export default function Chatbox({ orderid }) {
-    const userToken = localStorage.getItem('token');
+    const userToken = localStorage.getItem('dentigo_user_token');
     const adminToken = localStorage.getItem('dentigo_admin_token');
-    const designerToken = localStorage.getItem('token');
+    const designerToken = localStorage.getItem('dentigo_designer_token');
     const token = userToken || adminToken || designerToken || "";
 
     const userCtx = useContext(UserContext);
@@ -342,7 +342,7 @@ export default function Chatbox({ orderid }) {
         }
 
         try {
-            const base_url = localStorage.getItem("base_url") || config.API_BASE_URL;
+            const base_url = localStorage.getItem("dentigo_user_base_url") ;
             const encodedPath = encodeURIComponent(url);
             const finalUrl = `${base_url}/download?path=${encodedPath}`;
 

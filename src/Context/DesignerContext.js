@@ -5,7 +5,7 @@ export const DesignerContext = createContext();
 
 export const DesignerProvider = ({ children }) => {
     const [designer, setDesigner] = useState(() => {
-        const storedDesigner = localStorage.getItem('designer');
+        const storedDesigner = localStorage.getItem('dentigo_designer');
         return storedDesigner ? JSON.parse(storedDesigner) : null;
     });
 
@@ -13,18 +13,18 @@ export const DesignerProvider = ({ children }) => {
 
     useEffect(() => {
         if (designer) {
-            localStorage.setItem('designer', JSON.stringify(designer));
+            localStorage.setItem('dentigo_designer', JSON.stringify(designer));
         } else {
-            localStorage.removeItem('designer');
+            localStorage.removeItem('dentigo_designer');
         }
     }, [designer]);
 
     const logout = async () => {
         setDesigner(null);
-        localStorage.removeItem('designer');
-        localStorage.removeItem('token');
+        localStorage.removeItem('dentigo_designer');
+        localStorage.removeItem('dentigo_designer_token');
         localStorage.removeItem('theme');
-        localStorage.removeItem('base_url');
+        localStorage.removeItem('dentigo_designer_base_url');
         navigate('/designer', { replace: true });
     }
 

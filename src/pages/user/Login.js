@@ -15,8 +15,8 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
-        const user = localStorage.getItem("user");
-        const token = localStorage.getItem("token");
+        const user = localStorage.getItem("dentigo_user");
+        const token = localStorage.getItem("dentigo_user_token");
         if (user && token) navigate("/user/home");
     }, [navigate]);
 
@@ -37,9 +37,9 @@ export default function Login() {
             const data = await res.json();
             if (data.status === "success" && data.user?.userid) {
                 setUser(data.user);
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("user", JSON.stringify(data.user));
-                localStorage.setItem("base_url", data.base_url);
+                localStorage.setItem("dentigo_user_token", data.token);
+                localStorage.setItem("dentigo_user", JSON.stringify(data.user));
+                localStorage.setItem("dentigo_user_base_url", data.base_url);
                 navigate("/user/home");
             } else {
                 setStatus({ type: "error", message: data.message || "Invalid credentials" });
