@@ -18,26 +18,53 @@ export default function NewRequest() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFiles = (selectedFiles) => {
-    const zipFiles = Array.from(selectedFiles).filter(f => f.name.endsWith(".zip"));
+    const fileArray = Array.from(selectedFiles);
 
-    zipFiles.forEach((file) => {
-      setFiles((prev) => [
-        ...prev,
-        {
-          fileName: file.name,
-          progress: 0,
-          uploadStatus: "Waiting...",
-          orderId: "-",
-          productType: "-",
-          unit: "-",
-          tooth: "-",
-          message: "",
-          file: file
-        }
-      ]);
+    // 1. Separate valid and invalid files upfront
+    const zipFiles = fileArray.filter((file) => file.name.endsWith(".zip"));
+    const invalidFiles = fileArray.filter((file) => !file.name.endsWith(".zip"));
 
-      uploadFile(file);
-    });
+    // 2. Process valid .zip files first (if any exist)
+    if (zipFiles.length > 0) {
+      zipFiles.forEach((file) => {
+        setFiles((prev) => [
+          ...prev,
+          {
+            fileName: file.name,
+            progress: 0,
+            uploadStatus: "Waiting...",
+            orderId: "-",
+            productType: "-",
+            unit: "-",
+            tooth: "-",
+            message: "",
+            file: file,
+          },
+        ]);
+        uploadFile(file);
+      });
+    }
+
+    // 3. Show error for invalid files (if any exist)
+    if (invalidFiles.length > 0) {
+      // Show temporary error message
+      setFiles(prev => [...prev, {
+        fileName: `Invalid files detected (${invalidFiles.length})`,
+        progress: 0,
+        uploadStatus: "Error",
+        orderId: "-",
+        productType: "-",
+        unit: "-",
+        tooth: "-",
+        message: `Only .zip files are allowed! Skipped: ${invalidFiles.map(f => f.name).join(', ')}`,
+        isError: true
+      }]);
+
+      // Auto-remove the error message after 5 seconds
+      setTimeout(() => {
+        setFiles(prev => prev.filter(f => !f.isError));
+      }, 5000);
+    }
   };
 
   const token = localStorage.getItem('dentigo_user_token');
