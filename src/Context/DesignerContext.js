@@ -23,8 +23,8 @@ export const DesignerProvider = ({ children }) => {
         setDesigner(null);
         localStorage.removeItem('dentigo_designer');
         localStorage.removeItem('dentigo_designer_token');
-        localStorage.removeItem('theme');
         localStorage.removeItem('dentigo_designer_base_url');
+        localStorage.removeItem('theme');
         navigate('/designer', { replace: true });
     }
 
