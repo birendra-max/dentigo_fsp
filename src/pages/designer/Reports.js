@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useMemo } from "react";
+import { useContext, useState, useEffect } from "react";
 import Hd from './Hd';
 import Foot from './Foot';
 import { ThemeContext } from "../../Context/ThemeContext";
@@ -16,24 +16,19 @@ import {
     faSync,
     faHashtag
 } from '@fortawesome/free-solid-svg-icons';
-import { fetchWithAuth } from "../../utils/designerapi";
+import { fetchWithAuth } from '../../utils/designerapi';
 
 export default function Reports() {
     const { theme } = useContext(ThemeContext);
-    const [selectedFilter, setSelectedFilter] = useState('4'); // Default to 'All Time'
+    const [selectedFilter, setSelectedFilter] = useState('4');
     const [isLoading, setIsLoading] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [orderIdFrom, setOrderIdFrom] = useState('');
     const [orderIdTo, setOrderIdTo] = useState('');
-    const [allData, setAllData] = useState([]); // Store all data from backend
-    const [filteredData, setFilteredData] = useState([]); // Store filtered data for display
-    const [reportStats, setReportStats] = useState({
-        totalOrders: 0,
-        completed: 0,
-        inProgress: 0,
-        pending: 0
-    });
+    const [allData, setAllData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+    const [activeFilterType, setActiveFilterType] = useState('time'); // 'time' or 'custom'
 
     // Professional theme-based classes
     const getThemeClasses = () => {
@@ -46,12 +41,12 @@ export default function Reports() {
                 ? 'bg-white shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-gray-200'
                 : 'bg-gray-800/90 backdrop-blur-sm border border-gray-700 shadow-[0_4px_20px_rgba(0,0,0,0.3)]',
             input: isLight
-                ? 'bg-white border-2 border-gray-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/30 text-gray-900 placeholder-gray-500 shadow-sm'
-                : 'bg-gray-700 border-2 border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-white placeholder-gray-400 shadow-sm',
+                ? 'bg-white border-2 border-gray-300 focus:border-blue-600 text-gray-900 placeholder-gray-500 shadow-sm'
+                : 'bg-gray-700 border-2 border-gray-600 focus:border-blue-500 text-white placeholder-gray-400 shadow-sm',
             button: {
                 primary: isLight
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all cursor-pointer'
-                    : 'bg-blue-700 hover:bg-blue-600 text-white shadow-md hover:shadow-lg transition-all cursor-pointer',
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all'
+                    : 'bg-blue-700 hover:bg-blue-600 text-white shadow-md hover:shadow-lg transition-all',
                 success: isLight
                     ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg'
                     : 'bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-600 hover:to-blue-700 text-white shadow-md hover:shadow-lg',
@@ -81,14 +76,13 @@ export default function Reports() {
     const themeClasses = getThemeClasses();
 
     const columns = [
-        { header: "Order Id", accessor: "orderid" },
+        { header: "Order ID", accessor: "orderid" },
         { header: "File Name", accessor: "fname" },
         { header: "TAT", accessor: "tduration" },
         { header: "Status", accessor: "status" },
         { header: "Unit", accessor: "unit" },
         { header: "Tooth", accessor: "tooth" },
         { header: "Lab Name", accessor: "labname" },
-        { header: "Run Self By", accessor: "run_self_by" },
         { header: "Date", accessor: "order_date" },
         { header: "Message", accessor: "message" },
     ];
@@ -100,166 +94,193 @@ export default function Reports() {
         { value: '4', label: 'All Time', icon: faFilter },
     ];
 
-    // Calculate report statistics
-    const calculateStats = (cases) => {
-        const stats = {
-            totalOrders: cases.length,
-            completed: cases.filter(caseItem => caseItem.status === 'Designed Completed').length,
-            inProgress: cases.filter(caseItem => caseItem.status === 'In Progress').length,
-            pending: cases.filter(caseItem => caseItem.status === 'New' || caseItem.status === 'QC Required').length
-        };
-        setReportStats(stats);
-    };
+    // Universal date parser that works across all browsers
     const parseOrderDateOnly = (dateStr) => {
         if (!dateStr) return null;
 
-        // "14-Mar-2023 07:32:31am"
-        const [datePart] = dateStr.split(' ');
-        const [day, monthStr, year] = datePart.split('-');
+        try {
+            // Format: "14-Mar-2023 07:32:31am" or similar
+            const [datePart] = dateStr.split(' '); // ignore time
+            
+            const [day, monthStr, year] = datePart.split('-');
 
-        const months = {
-            Jan: 0, Feb: 1, Mar: 2, Apr: 3,
-            May: 4, Jun: 5, Jul: 6, Aug: 7,
-            Sep: 8, Oct: 9, Nov: 10, Dec: 11
-        };
-
-        return new Date(year, months[monthStr], day, 0, 0, 0, 0);
+            const months = {
+                Jan: 0, Feb: 1, Mar: 2, Apr: 3,
+                May: 4, Jun: 5, Jul: 6, Aug: 7,
+                Sep: 8, Oct: 9, Nov: 10, Dec: 11
+            };
+            
+            const monthIndex = months[monthStr];
+            if (monthIndex === undefined) {
+                // Try parsing as ISO format or other formats
+                const parsedDate = new Date(dateStr);
+                if (isNaN(parsedDate.getTime())) {
+                    return null;
+                }
+                // Reset time to midnight for date-only comparison
+                parsedDate.setHours(0, 0, 0, 0);
+                return parsedDate;
+            }
+            
+            // Create date using Date.UTC to avoid timezone issues
+            const date = new Date(Date.UTC(Number(year), monthIndex, Number(day)));
+            date.setHours(0, 0, 0, 0);
+            
+            return date;
+        } catch (error) {
+            console.error("Error parsing date:", dateStr, error);
+            return null;
+        }
     };
 
+    // Helper function to get start of day (midnight) for a date
+    const getStartOfDay = (date) => {
+        const newDate = new Date(date);
+        newDate.setHours(0, 0, 0, 0);
+        return newDate;
+    };
 
-    // Filter data based on all criteria
-    const applyFilters = () => {
+    // Apply TIME-BASED filters (Today/Weekly/Monthly/All Time)
+    const applyTimeFilters = () => {
         if (!allData.length) {
             setFilteredData([]);
-            calculateStats([]);
+            return;
+        }
+
+        let filtered = [...allData];
+        const today = getStartOfDay(new Date());
+
+        // ===== Time period filter =====
+        switch (selectedFilter) {
+            case '1': { // Today
+                filtered = filtered.filter(item => {
+                    const itemDate = parseOrderDateOnly(item.order_date);
+                    return itemDate && itemDate.getTime() === today.getTime();
+                });
+                break;
+            }
+
+            case '2': { // Last 7 Days
+                const weekAgo = new Date(today);
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                weekAgo.setHours(0, 0, 0, 0);
+
+                filtered = filtered.filter(item => {
+                    const itemDate = parseOrderDateOnly(item.order_date);
+                    return itemDate && itemDate >= weekAgo;
+                });
+                break;
+            }
+
+            case '3': { // Last 30 Days
+                const monthAgo = new Date(today);
+                monthAgo.setDate(monthAgo.getDate() - 30);
+                monthAgo.setHours(0, 0, 0, 0);
+
+                filtered = filtered.filter(item => {
+                    const itemDate = parseOrderDateOnly(item.order_date);
+                    return itemDate && itemDate >= monthAgo;
+                });
+                break;
+            }
+
+            case '4': // All Time
+            default:
+                // No filtering needed for All Time
+                break;
+        }
+
+        setFilteredData(filtered);
+    };
+
+    // Apply CUSTOM filters (Order ID range OR Date range)
+    const applyCustomFilters = () => {
+        if (!allData.length) {
+            setFilteredData([]);
             return;
         }
 
         let filtered = [...allData];
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const isOrderIdActive = orderIdFrom || orderIdTo;
-        const isCustomDateActive = startDate || endDate;
-
-        // ===== TIME PERIOD FILTER (only if NO Order ID & NO custom date) =====
-        if (!isOrderIdActive && !isCustomDateActive) {
-            switch (selectedFilter) {
-                case '1': { // Today
-                    const tomorrow = new Date(today);
-                    tomorrow.setDate(today.getDate() + 1);
-
-                    filtered = filtered.filter(item => {
-                        const itemDate = parseOrderDateOnly(item.order_date);
-                        return itemDate && itemDate >= today && itemDate < tomorrow;
-                    });
-                    break;
-                }
-
-                case '2': { // Last 7 days
-                    const weekAgo = new Date(today);
-                    weekAgo.setDate(today.getDate() - 7);
-
-                    filtered = filtered.filter(item => {
-                        const itemDate = parseOrderDateOnly(item.order_date);
-                        return itemDate && itemDate >= weekAgo;
-                    });
-                    break;
-                }
-
-                case '3': { // Last 30 days
-                    const monthAgo = new Date(today);
-                    monthAgo.setDate(today.getDate() - 30);
-
-                    filtered = filtered.filter(item => {
-                        const itemDate = parseOrderDateOnly(item.order_date);
-                        return itemDate && itemDate >= monthAgo;
-                    });
-                    break;
-                }
-
-                case '4': // All Time
-                default:
-                    break;
-            }
+        // ===== Order ID filter =====
+        if (orderIdFrom) {
+            const fromId = parseInt(orderIdFrom);
+            filtered = filtered.filter(item => {
+                const itemId = parseInt(item.orderid);
+                return !isNaN(itemId) && itemId >= fromId;
+            });
         }
 
-        // ===== ORDER ID FILTER (highest priority) =====
-        if (isOrderIdActive) {
-            if (orderIdFrom) {
-                const fromId = parseInt(orderIdFrom);
-                filtered = filtered.filter(item => parseInt(item.orderid) >= fromId);
-            }
-
-            if (orderIdTo) {
-                const toId = parseInt(orderIdTo);
-                filtered = filtered.filter(item => parseInt(item.orderid) <= toId);
-            }
+        if (orderIdTo) {
+            const toId = parseInt(orderIdTo);
+            filtered = filtered.filter(item => {
+                const itemId = parseInt(item.orderid);
+                return !isNaN(itemId) && itemId <= toId;
+            });
         }
 
-        // ===== CUSTOM DATE RANGE (only if NO Order ID) =====
-        if (!isOrderIdActive && isCustomDateActive) {
-            if (startDate) {
-                const start = new Date(startDate);
-                start.setHours(0, 0, 0, 0);
+        // ===== Custom Date Range (DATE ONLY) =====
+        if (startDate) {
+            const start = getStartOfDay(new Date(startDate));
+            
+            filtered = filtered.filter(item => {
+                const itemDate = parseOrderDateOnly(item.order_date);
+                return itemDate && itemDate >= start;
+            });
+        }
 
-                filtered = filtered.filter(item => {
-                    const itemDate = parseOrderDateOnly(item.order_date);
-                    return itemDate && itemDate >= start;
-                });
-            }
-
-            if (endDate) {
-                const end = new Date(endDate);
-                end.setHours(0, 0, 0, 0);
-
-                filtered = filtered.filter(item => {
-                    const itemDate = parseOrderDateOnly(item.order_date);
-                    return itemDate && itemDate <= end;
-                });
-            }
+        if (endDate) {
+            const end = getStartOfDay(new Date(endDate));
+            
+            filtered = filtered.filter(item => {
+                const itemDate = parseOrderDateOnly(item.order_date);
+                return itemDate && itemDate <= end;
+            });
         }
 
         setFilteredData(filtered);
-        calculateStats(filtered);
     };
 
-    // Handle search button click
+    // Handle search button click for custom filters
     const handleSearchClick = () => {
-        applyFilters();
+        setActiveFilterType('custom');
+        applyCustomFilters();
     };
 
-    // Handle filter button click
+    // Handle filter button click for time filters
     const handleFilterClick = (filterValue) => {
         setSelectedFilter(filterValue);
+        setActiveFilterType('time');
     };
 
     // Handle download report
     const handleDownloadReport = () => {
-        if (filteredData.length === 0) {
-            alert('No data available to download');
-            return;
+        if (filteredData.length > 0) {
+            const fileName = `report_${new Date().toISOString().split('T')[0]}.csv`;
+
+            // Simple CSV export
+            const headers = columns.map(col => col.header).join(',');
+            const csvData = filteredData.map(row =>
+                columns.map(col => {
+                    const value = row[col.accessor] || '';
+                    // Escape quotes and wrap in quotes
+                    return `"${String(value).replace(/"/g, '""')}"`;
+                }).join(',')
+            ).join('\n');
+
+            const csvContent = `${headers}\n${csvData}`;
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } else {
+            alert('No data to export');
         }
-
-        // Create CSV content
-        const headers = columns.map(col => col.header).join(',');
-        const rows = filteredData.map(item =>
-            columns.map(col => `"${item[col.accessor] || ''}"`).join(',')
-        ).join('\n');
-
-        const csvContent = `${headers}\n${rows}`;
-
-        // Create and download file
-        const blob = new Blob([csvContent], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `report-${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
     };
 
     // Handle reset filters
@@ -268,9 +289,9 @@ export default function Reports() {
         setEndDate('');
         setOrderIdFrom('');
         setOrderIdTo('');
-        setSelectedFilter('4'); // Reset to "All Time"
+        setSelectedFilter('4');
+        setActiveFilterType('time');
         setFilteredData(allData);
-        calculateStats(allData);
     };
 
     // Handle order ID input validation
@@ -284,39 +305,44 @@ export default function Reports() {
         setOrderIdTo(value);
     };
 
-    // Apply filters whenever any filter criteria changes
+    // Apply filters whenever selectedFilter changes (for time filters)
     useEffect(() => {
-        applyFilters();
-    }, [selectedFilter, allData]);
+        if (activeFilterType === 'time') {
+            applyTimeFilters();
+        }
+    }, [selectedFilter]);
+
+    // Apply filters when custom filter inputs change
+    useEffect(() => {
+        if (activeFilterType === 'custom') {
+            const timeoutId = setTimeout(() => {
+                applyCustomFilters();
+            }, 300);
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [startDate, endDate, orderIdFrom, orderIdTo, activeFilterType]);
 
     // Initial data fetch
     useEffect(() => {
         async function fetchAllCases() {
             setIsLoading(true);
             try {
-                const responseData = await fetchWithAuth("/get-reports", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        filter: 'all',
-                        startDate: '',
-                        endDate: '',
-                    }),
+                const data = await fetchWithAuth('/get-all-cases', {
+                    method: "GET",
                 });
 
-                if (responseData?.status === "success") {
-                    setAllData(responseData.cases);
-                    setFilteredData(responseData.cases);
-                    calculateStats(responseData.cases);
+                if (data && data.status === 'success') {
+                    setAllData(data.new_cases || []);
+                    setFilteredData(data.new_cases || []);
                 } else {
                     setAllData([]);
                     setFilteredData([]);
-                    setReportStats({ totalOrders: 0, completed: 0, inProgress: 0, pending: 0 });
                 }
             } catch (error) {
-                console.error("Report fetch error:", error);
+                console.error("Error fetching cases:", error);
                 setAllData([]);
                 setFilteredData([]);
-                setReportStats({ totalOrders: 0, completed: 0, inProgress: 0, pending: 0 });
             } finally {
                 setIsLoading(false);
             }
@@ -329,7 +355,7 @@ export default function Reports() {
         <>
             <Hd />
             <main id="main" className={`flex-grow px-4 transition-colors duration-300 ${themeClasses.main} pt-14`}>
-                <div className="min-h-screen px-2 sm:px-6 lg:px-2">
+                <div className="px-2 sm:px-6 lg:px-2 mt-8">
                     <div className="w-full max-w-full">
 
                         {/* Enhanced Header Section - ORIGINAL TEXT KEPT */}
@@ -337,10 +363,10 @@ export default function Reports() {
                             <div className="container mx-auto">
                                 <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
                                     <div className="text-center sm:text-left">
-                                        <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                                        <h1 className={`text-2xl sm:text-3xl font-bold text-white`}>
                                             Reports & Analytics
                                         </h1>
-                                        <p className="mt-2 text-sm sm:text-base text-blue-100">
+                                        <p className={`mt-2 text-sm sm:text-base text-blue-100`}>
                                             Generate comprehensive reports and analyze order performance
                                         </p>
                                     </div>
@@ -348,8 +374,8 @@ export default function Reports() {
                                         <ol className="flex items-center space-x-2 sm:space-x-3 text-sm">
                                             <li>
                                                 <Link
-                                                    to="/designer/home"
-                                                    className="hover:text-blue-700 transition-colors duration-300 flex items-center text-blue-100"
+                                                    to="/user/home"
+                                                    className={`hover:text-blue-700 transition-colors duration-300 flex items-center text-blue-100`}
                                                 >
                                                     <FontAwesomeIcon icon={faHome} className="w-4 h-4 mr-2" />
                                                     <span>Dashboard</span>
@@ -380,9 +406,9 @@ export default function Reports() {
                                     <div className="flex space-x-3">
                                         <button
                                             onClick={handleResetFilters}
-                                            className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${theme === 'light'
-                                                ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100 border border-gray-300'
-                                                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border border-gray-600'
+                                            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all ${theme === 'light'
+                                                ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                                                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
                                                 }`}
                                         >
                                             <FontAwesomeIcon icon={faSync} className="w-4 h-4" />
@@ -391,7 +417,7 @@ export default function Reports() {
                                         <button
                                             onClick={handleDownloadReport}
                                             disabled={filteredData.length === 0}
-                                            className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${filteredData.length === 0
+                                            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all ${filteredData.length === 0
                                                 ? 'bg-gray-400 cursor-not-allowed'
                                                 : themeClasses.button.download
                                                 }`}
@@ -402,7 +428,7 @@ export default function Reports() {
                                     </div>
                                 </div>
 
-                                <div className="max-w-6xl mx-auto">
+                                <div className="max-w-6xl mx-auto ml-38">
                                     <div className="flex items-end gap-4 flex-nowrap overflow-x-auto">
 
                                         {/* Order ID From */}
@@ -435,7 +461,7 @@ export default function Reports() {
                                             />
                                         </div>
 
-                                        {/* OR Divider */}
+                                        {/* OR */}
                                         <div className="flex items-center pb-1 px-2 font-bold text-lg text-gray-500 whitespace-nowrap flex-shrink-0">
                                             OR
                                         </div>
@@ -491,10 +517,10 @@ export default function Reports() {
 
                                     </div>
 
-                                    {/* Search Tips – text preserved */}
-                                    <div className="mt-4 text-center">
+                                    {/* Search Tips – kept exactly as requested */}
+                                    <div className="mt-4 text-left">
                                         <p className={`text-xs ${themeClasses.text.muted}`}>
-                                            Tip: Use <b>Order ID range OR Date filters</b> to refine your report.
+                                            Tip: Use Order ID range <b>OR</b> date filters to refine your report.
                                             Showing {filteredData.length} of {allData.length} records.
                                         </p>
                                     </div>
@@ -521,14 +547,14 @@ export default function Reports() {
                                                 key={button.value}
                                                 onClick={() => handleFilterClick(button.value)}
                                                 disabled={isLoading}
-                                                className={`px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3 min-w-[120px] cursor-pointer ${selectedFilter === button.value
+                                                className={`cursor-pointer px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3 min-w-[120px] cursor-pointer ${selectedFilter === button.value && activeFilterType === 'time'
                                                     ? `${themeClasses.button.filterActive} transform scale-105`
                                                     : themeClasses.button.filterInactive
                                                     } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
                                             >
                                                 <FontAwesomeIcon
                                                     icon={button.icon}
-                                                    className={`w-4 h-4 ${selectedFilter === button.value ? 'text-white' : 'text-blue-500'
+                                                    className={`w-4 h-4 ${selectedFilter === button.value && activeFilterType === 'time' ? 'text-white' : 'text-blue-500'
                                                         }`}
                                                 />
                                                 <span className="font-medium">{button.label}</span>
