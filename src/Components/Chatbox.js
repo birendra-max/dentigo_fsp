@@ -378,7 +378,7 @@ export default function Chatbox({ orderid }) {
         }
 
         try {
-            const base_url = localStorage.getItem("skydent_user_base_url") || localStorage.getItem("skydent_designer_base_url") || localStorage.getItem("skydent_admin_base_url");
+            const base_url = localStorage.getItem("dentigo_user_base_url") || localStorage.getItem("dentigo_designer_base_url") || localStorage.getItem("dentigo_admin_base_url");
             const encodedPath = encodeURIComponent(url);
             const finalUrl = `${base_url}/download?path=${encodedPath}`;
 
