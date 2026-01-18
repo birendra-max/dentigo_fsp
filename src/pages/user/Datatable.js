@@ -194,8 +194,7 @@ export default function Datatable({
     const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
     const [orderid, setOrderid] = useState(null);
     const { user } = useContext(UserContext);
-    console.log(user);
-    // ✅ NEW STATES for multi-select & dropdown
+    
     const [selectedRows, setSelectedRows] = useState([]);
     const [fileType, setFileType] = useState("stl");
 
