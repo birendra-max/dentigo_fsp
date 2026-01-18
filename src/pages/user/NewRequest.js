@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useRef } from "react";
 import Hd from "./Hd";
 import Foot from "./Foot";
 import { useNavigate } from "react-router-dom";
@@ -15,273 +15,11 @@ export default function NewRequest() {
   const [drag, setDragActive] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState("");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [uploadRequests, setUploadRequests] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleFiles = (selectedFiles) => {
-    const fileArray = Array.from(selectedFiles);
-
-    // 1. Separate valid and invalid files upfront
-    const zipFiles = fileArray.filter((file) => file.name.endsWith(".zip"));
-    const invalidFiles = fileArray.filter((file) => !file.name.endsWith(".zip"));
-
-    // 2. Process valid .zip files first (if any exist)
-    if (zipFiles.length > 0) {
-      zipFiles.forEach((file) => {
-        setFiles((prev) => [
-          ...prev,
-          {
-            fileName: file.name,
-            progress: 0,
-            uploadStatus: "Waiting...",
-            orderId: "-",
-            productType: "-",
-            unit: "-",
-            tooth: "-",
-            message: "",
-            file: file,
-          },
-        ]);
-        uploadFile(file);
-      });
-    }
-
-    // 3. Show error for invalid files (if any exist)
-    if (invalidFiles.length > 0) {
-      // Show temporary error message
-      setFiles(prev => [...prev, {
-        fileName: `Invalid files detected (${invalidFiles.length})`,
-        progress: 0,
-        uploadStatus: "Error",
-        orderId: "-",
-        productType: "-",
-        unit: "-",
-        tooth: "-",
-        message: `Only .zip files are allowed! Skipped: ${invalidFiles.map(f => f.name).join(', ')}`,
-        isError: true
-      }]);
-
-      // Auto-remove the error message after 5 seconds
-      setTimeout(() => {
-        setFiles(prev => prev.filter(f => !f.isError));
-      }, 5000);
-    }
-  };
-
-  const token = localStorage.getItem('dentigo_user_token');
-
-  const uploadFile = async (file) => {
-    try {
-      const checkResponse = await fetchWithAuth(`check-file-exists?file=${encodeURIComponent(file.name)}`);
-
-      if (checkResponse.message === 'File already exists') {
-        const confirmUpload = window.confirm(
-          `The file "${file.name}" already exists.\nDo you want to proceed with uploading?`
-        );
-
-        if (!confirmUpload) {
-          setFiles((prev) =>
-            prev.map((f) =>
-              f.fileName === file.name
-                ? { ...f, uploadStatus: "Cancelled", progress: 0 }
-                : f
-            )
-          );
-          return;
-        }
-      }
-    } catch (err) {
-      console.error("File check error:", err);
-    }
-
-    return new Promise((resolve, reject) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("userid", user.userid);
-      formData.append("labname", user.labname);
-
-      const xhr = new XMLHttpRequest();
-
-      xhr.upload.addEventListener('progress', (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = Math.round((event.loaded / event.total) * 100);
-          setFiles((prev) =>
-            prev.map((f) =>
-              f.fileName === file.name
-                ? {
-                  ...f,
-                  progress: percentComplete,
-                  uploadStatus: `Uploading... ${percentComplete}%`
-                }
-                : f
-            )
-          );
-        }
-      });
-
-      xhr.addEventListener('load', () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const result = JSON.parse(xhr.responseText);
-            setFiles((prev) =>
-              prev.map((f) =>
-                f.fileName === file.name
-                  ? {
-                    ...f,
-                    progress: 100,
-                    uploadStatus: "Success",
-                    orderId: result.id,
-                    productType: result.product_type,
-                    unit: result.unit,
-                    tooth: result.tooth,
-                    message: result.message
-                  }
-                  : f
-              )
-            );
-            resolve(result);
-          } catch (error) {
-            setFiles((prev) =>
-              prev.map((f) =>
-                f.fileName === file.name
-                  ? {
-                    ...f,
-                    progress: 100,
-                    uploadStatus: "Failed",
-                    message: "Invalid response from server"
-                  }
-                  : f
-              )
-            );
-            reject(new Error('Invalid response from server'));
-          }
-        } else {
-          setFiles((prev) =>
-            prev.map((f) =>
-              f.fileName === file.name
-                ? {
-                  ...f,
-                  progress: 100,
-                  uploadStatus: "Failed",
-                  message: `Server error: ${xhr.status}`
-                }
-                : f
-            )
-          );
-          reject(new Error(`Server error: ${xhr.status}`));
-        }
-      });
-
-      xhr.addEventListener('error', () => {
-        setFiles((prev) =>
-          prev.map((f) =>
-            f.fileName === file.name
-              ? {
-                ...f,
-                progress: 100,
-                uploadStatus: "Failed",
-                message: "Network error - upload failed"
-              }
-              : f
-          )
-        );
-        reject(new Error('Network error'));
-      });
-
-      xhr.addEventListener('abort', () => {
-        setFiles((prev) =>
-          prev.map((f) =>
-            f.fileName === file.name
-              ? { ...f, uploadStatus: "Cancelled", progress: 0 }
-              : f
-          )
-        );
-        reject(new Error('Upload cancelled'));
-      });
-
-      xhr.open('POST', `${base_url}/new-orders`);
-      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-      xhr.setRequestHeader('X-Tenant', 'dentigo');
-      xhr.send(formData);
-    });
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFiles(e.dataTransfer.files);
-    }
-  };
-
-  const handleMessageChange = (fileName, value) => {
-    setFiles((prev) =>
-      prev.map((f) => (f.fileName === fileName ? { ...f, message: value } : f))
-    );
-  };
-
-  const resetPage = () => {
-    setFiles([]);
-    setSelectedDuration("");
-    setShowSuccessPopup(false);
-    setIsSubmitting(false);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!selectedDuration) {
-      alert("Please select a time duration");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    const filesWithDuration = files.map(file => ({
-      ...file,
-      tduration: selectedDuration
-    }));
-
-    try {
-      const response = await fetch(`${base_url}/new-orders-data`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          'Authorization': `Bearer ${token}`,
-          'X-Tenant': 'dentigo'
-        },
-        body: JSON.stringify(filesWithDuration),
-      });
-
-      const resp = await response.json();
-      if (resp.status === 'completed') {
-        if (resp.results.length === files.length) {
-          setShowSuccessPopup(true);
-          setTimeout(() => {
-            resetPage();
-          }, 3000);
-        }
-      }
-      else {
-        if (resp.error === 'Invalid or expired token') {
-          alert('Invalid or expired token. Please log in again.')
-          navigate(logout);
-        }
-      }
-
-    } catch (error) {
-      console.error("Error submitting:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const canSubmit = files.length > 0 &&
-    files.some(f => f.uploadStatus === "Success") &&
-    !files.some(f => f.uploadStatus.startsWith("Uploading...")) &&
-    selectedDuration &&
-    !isSubmitting;
+  
+  const processingQueueRef = useRef([]);
+  const isProcessingRef = useRef(false);
 
   const getCardClass = () => {
     return theme === 'light'
@@ -324,42 +62,63 @@ export default function NewRequest() {
           light: { bg: "bg-red-50", text: "text-red-700", border: "border-red-200" },
           dark: { bg: "bg-red-900/20", text: "text-red-400", border: "border-red-800" }
         },
-        "Uploading...": {
+        Uploading: {
           light: { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
           dark: { bg: "bg-blue-900/20", text: "text-blue-400", border: "border-blue-800" }
         },
         "Waiting...": {
           light: { bg: "bg-gray-100", text: "text-gray-700", border: "border-gray-200" },
           dark: { bg: "bg-gray-800", text: "text-gray-400", border: "border-gray-700" }
+        },
+        Cancelled: {
+          light: { bg: "bg-gray-100", text: "text-gray-700", border: "border-gray-200" },
+          dark: { bg: "bg-gray-800", text: "text-gray-400", border: "border-gray-700" }
+        },
+        "Cancelling...": {
+          light: { bg: "bg-yellow-50", text: "text-yellow-700", border: "border-yellow-200" },
+          dark: { bg: "bg-yellow-900/20", text: "text-yellow-400", border: "border-yellow-800" }
         }
       };
 
-      return theme === 'light' ? config[status]?.light : config[status]?.dark;
+      const statusKey = status.startsWith("Uploading") ? "Uploading" : status.split(' ')[0];
+      return theme === 'light' ? config[statusKey]?.light : config[statusKey]?.dark;
     };
 
-    const config = getStatusConfig(status.split(' ')[0]);
-    const isUploading = status.startsWith("Uploading...");
+    const config = getStatusConfig(status);
+    const isUploading = status === "Uploading" || status.startsWith("Uploading...");
     const percentage = isUploading ? progress : 0;
 
-    return (
-      <div className="flex flex-col space-y-2">
-        <div className={`inline-flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium border ${config?.bg || 'bg-gray-100'} ${config?.text || 'text-gray-700'} ${config?.border || 'border-gray-200'}`}>
-          <div className={`w-2 h-2 rounded-full ${status === "Success" ? "bg-green-500" :
-            status === "Failed" ? "bg-red-500" :
-              isUploading ? "bg-blue-500 animate-pulse" :
-                "bg-gray-400"
-            }`} />
-          <span>{status}</span>
-        </div>
-
-        {isUploading && (
+    if (isUploading && progress > 0 && progress < 100) {
+      return (
+        <div className="flex flex-col space-y-2">
+          <div className={`inline-flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium border ${config?.bg || 'bg-gray-100'} ${config?.text || 'text-gray-700'} ${config?.border || 'border-gray-200'}`}>
+            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+            <span>Uploading {progress}%</span>
+          </div>
           <div className={`w-full rounded-full h-2 ${theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'}`}>
             <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
               style={{ width: `${percentage}%` }}
             ></div>
           </div>
-        )}
+        </div>
+      );
+    }
+
+    if (isUploading && progress === 100) {
+      return <div></div>;
+    }
+
+    return (
+      <div className="flex flex-col space-y-2">
+        <div className={`inline-flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium border ${config?.bg || 'bg-gray-100'} ${config?.text || 'text-gray-700'} ${config?.border || 'border-gray-200'}`}>
+          <div className={`w-2 h-2 rounded-full ${status === "Success" ? "bg-green-500" :
+            status === "Failed" ? "bg-red-500" :
+              status === "Cancelled" || status === "Cancelling..." ? "bg-gray-500" :
+                "bg-gray-400"
+            }`} />
+          <span>{status}</span>
+        </div>
 
         {status === "Failed" && message && (
           <div className={`text-xs px-2 py-1 rounded ${theme === 'light'
@@ -372,6 +131,339 @@ export default function NewRequest() {
       </div>
     );
   };
+
+  const handleFiles = (selectedFiles) => {
+    const fileArray = Array.from(selectedFiles);
+    const zipFiles = fileArray.filter((file) => file.name.endsWith(".zip"));
+    const invalidFiles = fileArray.filter((file) => !file.name.endsWith(".zip"));
+
+    if (zipFiles.length > 0) {
+      const newFiles = zipFiles.map((file) => ({
+        id: `${file.name}-${Date.now()}-${Math.random()}`,
+        fileName: file.name,
+        progress: 0,
+        uploadStatus: "Waiting...",
+        orderId: "-",
+        productType: "-",
+        unit: "-",
+        tooth: "-",
+        message: "",
+        file: file,
+      }));
+
+      setFiles((prev) => [...prev, ...newFiles]);
+      newFiles.forEach(fileData => {
+        processingQueueRef.current.push(fileData);
+      });
+      
+      if (!isProcessingRef.current) {
+        processQueue();
+      }
+    }
+
+    if (invalidFiles.length > 0) {
+      setFiles(prev => [...prev, {
+        id: `invalid-${Date.now()}`,
+        fileName: `Invalid files detected (${invalidFiles.length})`,
+        progress: 0,
+        uploadStatus: "Error",
+        orderId: "-",
+        productType: "-",
+        unit: "-",
+        tooth: "-",
+        message: `Only .zip files are allowed! Skipped: ${invalidFiles.map(f => f.name).join(', ')}`,
+        isError: true
+      }]);
+
+      setTimeout(() => {
+        setFiles(prev => prev.filter(f => !f.isError));
+      }, 5000);
+    }
+  };
+
+  const token = localStorage.getItem('dentigo_user_token');
+
+  const processQueue = () => {
+    if (isProcessingRef.current || processingQueueRef.current.length === 0) {
+      return;
+    }
+
+    const fileData = processingQueueRef.current.shift();
+    isProcessingRef.current = true;
+    
+    setFiles(prev =>
+      prev.map(f =>
+        f.id === fileData.id
+          ? { ...f, uploadStatus: "Uploading", progress: 0 }
+          : f
+      )
+    );
+    
+    uploadFile(fileData.file, fileData.id);
+  };
+
+  const uploadFile = (file, fileId) => {
+    fetchWithAuth(`check-file-exists?file=${encodeURIComponent(file.name)}`)
+      .then(checkResponse => {
+        if (checkResponse.message === 'File already exists') {
+          const confirmUpload = window.confirm(
+            `The file "${file.name}" already exists.\nDo you want to proceed with uploading?`
+          );
+
+          if (!confirmUpload) {
+            setFiles((prev) =>
+              prev.map((f) =>
+                f.id === fileId
+                  ? { ...f, uploadStatus: "Cancelled", progress: 0 }
+                  : f
+              )
+            );
+            isProcessingRef.current = false;
+            processQueue();
+            return;
+          }
+        }
+      })
+      .catch(err => {
+        console.error("File check error:", err);
+      });
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("userid", user.userid);
+    formData.append("labname", user.labname);
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener('progress', (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        setFiles((prev) =>
+          prev.map((f) =>
+            f.id === fileId
+              ? { ...f, progress: percentComplete }
+              : f
+          )
+        );
+        
+        if (percentComplete === 100) {
+          isProcessingRef.current = false;
+          processQueue();
+        }
+      }
+    });
+
+    xhr.addEventListener('load', () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const result = JSON.parse(xhr.responseText);
+          setFiles((prev) =>
+            prev.map((f) =>
+              f.id === fileId
+                ? {
+                  ...f,
+                  progress: 100,
+                  uploadStatus: "Success",
+                  orderId: result.id,
+                  productType: result.product_type,
+                  unit: result.unit,
+                  tooth: result.tooth,
+                  message: result.message
+                }
+                : f
+            )
+          );
+        } catch (error) {
+          setFiles((prev) =>
+            prev.map((f) =>
+              f.id === fileId
+                ? {
+                  ...f,
+                  progress: 100,
+                  uploadStatus: "Failed",
+                  message: "Invalid response from server"
+                }
+                : f
+            )
+          );
+        }
+      } else {
+        setFiles((prev) =>
+          prev.map((f) =>
+            f.id === fileId
+              ? {
+                ...f,
+                progress: 100,
+                uploadStatus: "Failed",
+                message: `Server error: ${xhr.status}`
+              }
+              : f
+          )
+        );
+      }
+
+      setUploadRequests(prev => {
+        const newRequests = { ...prev };
+        delete newRequests[fileId];
+        return newRequests;
+      });
+    });
+
+    xhr.addEventListener('error', () => {
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.id === fileId
+            ? {
+              ...f,
+              progress: 100,
+              uploadStatus: "Failed",
+              message: "Network error"
+            }
+            : f
+        )
+      );
+
+      setUploadRequests(prev => {
+        const newRequests = { ...prev };
+        delete newRequests[fileId];
+        return newRequests;
+      });
+    });
+
+    xhr.open('POST', `${base_url}/new-orders`);
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.setRequestHeader('X-Tenant', 'dentigo');
+    xhr.timeout = 300000;
+    xhr.send(formData);
+
+    setUploadRequests(prev => ({ ...prev, [fileId]: xhr }));
+  };
+
+  const cancelUpload = (fileId) => {
+    if (uploadRequests[fileId]) {
+      uploadRequests[fileId].abort();
+      setFiles(prev =>
+        prev.map(f =>
+          f.id === fileId
+            ? { ...f, uploadStatus: "Cancelled", progress: 0 }
+            : f
+        )
+      );
+
+      processingQueueRef.current = processingQueueRef.current.filter(f => f.id !== fileId);
+
+      setUploadRequests(prev => {
+        const newRequests = { ...prev };
+        delete newRequests[fileId];
+        return newRequests;
+      });
+      
+      if (isProcessingRef.current) {
+        isProcessingRef.current = false;
+        setTimeout(() => processQueue(), 100);
+      }
+    } else {
+      const inQueue = processingQueueRef.current.find(f => f.id === fileId);
+      if (inQueue) {
+        processingQueueRef.current = processingQueueRef.current.filter(f => f.id !== fileId);
+        setFiles(prev =>
+          prev.map(f =>
+            f.id === fileId
+              ? { ...f, uploadStatus: "Cancelled", progress: 0 }
+              : f
+          )
+        );
+      }
+    }
+  };
+
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleMessageChange = (fileId, value) => {
+    setFiles((prev) =>
+      prev.map((f) => (f.id === fileId ? { ...f, message: value } : f))
+    );
+  };
+
+  const resetPage = () => {
+    setFiles([]);
+    setSelectedDuration("");
+    setShowSuccessPopup(false);
+    processingQueueRef.current = [];
+    isProcessingRef.current = false;
+    setIsSubmitting(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!selectedDuration) {
+      alert("Please select a time duration");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const filesWithDuration = files
+      .filter(f => f.uploadStatus === "Success")
+      .map(file => ({
+        ...file,
+        tduration: selectedDuration
+      }));
+
+    if (filesWithDuration.length === 0) {
+      alert("No successful uploads to submit!");
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${base_url}/new-orders-data`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
+          'X-Tenant': 'dentigo'
+        },
+        body: JSON.stringify(filesWithDuration),
+      });
+
+      const resp = await response.json();
+      if (resp.status === 'completed') {
+        if (resp.results.length === filesWithDuration.length) {
+          setShowSuccessPopup(true);
+          setTimeout(() => {
+            resetPage();
+          }, 3000);
+        }
+      } else {
+        if (resp.error === 'Invalid or expired token') {
+          alert('Invalid or expired token. Please log in again.')
+          navigate(logout);
+        }
+      }
+
+    } catch (error) {
+      console.error("Error submitting:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const canSubmit = files.length > 0 &&
+    files.some(f => f.uploadStatus === "Success") &&
+    !files.some(f => f.uploadStatus === "Uploading" || f.uploadStatus === "Waiting...") &&
+    selectedDuration &&
+    !isSubmitting;
 
   return (
     <>
@@ -463,7 +555,7 @@ export default function NewRequest() {
                   {[
                     { count: files.length, label: "Total Files", bg: "bg-blue-500" },
                     { count: files.filter(f => f.uploadStatus === "Success").length, label: "Completed", bg: "bg-green-500" },
-                    { count: files.filter(f => f.uploadStatus.startsWith("Uploading...")).length, label: "In Progress", bg: "bg-yellow-500" },
+                    { count: files.filter(f => f.uploadStatus === "Uploading").length, label: "In Progress", bg: "bg-yellow-500" },
                     { count: files.filter(f => f.uploadStatus === "Waiting...").length, label: "Pending", bg: "bg-gray-500" },
                   ].map((card, index) => (
                     <div key={index} className={`${card.bg} text-white rounded-lg p-4`}>
@@ -497,8 +589,8 @@ export default function NewRequest() {
                         </tr>
                       </thead>
                       <tbody>
-                        {files.map((file, idx) => (
-                          <tr key={idx} className={getTableRowClass()}>
+                        {files.map((file) => (
+                          <tr key={file.id} className={getTableRowClass()}>
                             <td className="px-4 py-3">
                               <span className={`text-sm font-medium px-2 py-1 rounded ${theme === 'light' ? 'bg-gray-100 text-gray-900' : 'bg-gray-700 text-white'}`}>
                                 {file.orderId}
@@ -508,8 +600,9 @@ export default function NewRequest() {
                               <div className="flex items-center space-x-3">
                                 <div className={`w-2 h-2 rounded-full ${file.uploadStatus === "Success" ? "bg-green-500" :
                                   file.uploadStatus === "Failed" ? "bg-red-500" :
-                                    file.uploadStatus.startsWith("Uploading...") ? "bg-blue-500 animate-pulse" :
-                                      "bg-gray-400"
+                                    file.uploadStatus === "Cancelled" || file.uploadStatus === "Cancelling..." ? "bg-gray-500" :
+                                      file.uploadStatus === "Uploading" ? "bg-blue-500 animate-pulse" :
+                                        "bg-gray-400"
                                   }`} />
                                 <span className="text-sm font-medium">
                                   {file.fileName}
@@ -536,9 +629,10 @@ export default function NewRequest() {
                               <input
                                 type="text"
                                 value={file.message}
-                                onChange={(e) => handleMessageChange(file.fileName, e.target.value)}
+                                onChange={(e) => handleMessageChange(file.id, e.target.value)}
                                 className={`w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${getInputClass()}`}
                                 placeholder="Add instructions..."
+                                disabled={file.uploadStatus === "Cancelled" || file.uploadStatus === "Cancelling..." || file.uploadStatus === "Uploading"}
                               />
                             </td>
                           </tr>
@@ -715,7 +809,7 @@ export default function NewRequest() {
                         <h3 className={`text-xl font-bold mb-6 ${theme === 'light' ? 'text-black' : 'text-white'}`}>Submit Orders</h3>
                         <div className={`
                           flex items-center p-4 rounded-lg mb-6 text-sm font-medium
-                          ${files.some(f => f.uploadStatus.startsWith("Uploading..."))
+                          ${files.some(f => f.uploadStatus === "Uploading" || f.uploadStatus === "Waiting...")
                             ? theme === 'light'
                               ? "bg-yellow-50 text-yellow-700 border border-yellow-200"
                               : "bg-yellow-900/20 text-yellow-300 border border-yellow-800"
@@ -733,7 +827,7 @@ export default function NewRequest() {
                           }`}
                         >
                           <div className="flex items-center space-x-2">
-                            {files.some(f => f.uploadStatus.startsWith("Uploading...")) ? (
+                            {files.some(f => f.uploadStatus === "Uploading" || f.uploadStatus === "Waiting...") ? (
                               <>
                                 <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
                                 <span>Please wait for all uploads to complete</span>
