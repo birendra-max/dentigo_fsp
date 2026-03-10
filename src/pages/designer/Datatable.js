@@ -286,7 +286,6 @@ export default function Datatable({
 
             try {
                 if (fileType === "stl") {
-                    // Step 1: get all STL file paths from backend
                     const res = await fetch(`${base_url}/download-all?orderid=${id}`, {
                         headers: { 'X-Tenant': 'dentigo' }
                     });
@@ -297,14 +296,11 @@ export default function Datatable({
                         continue;
                     }
 
-                    // Step 2: download each STL file via backend
                     for (const filePath of files) {
                         if (!filePath) continue;
-
                         const encodedPath = encodeURIComponent(filePath);
                         const finalUrl = `${base_url}/download?path=${encodedPath}`;
                         const filename = filePath.split('/').pop();
-
                         const link = document.createElement("a");
                         link.href = finalUrl;
                         link.target = "_blank";
@@ -312,12 +308,10 @@ export default function Datatable({
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
-
-                        await new Promise(r => setTimeout(r, 500)); // optional delay
+                        await new Promise(r => setTimeout(r, 500));
                     }
 
                 } else if (fileType === "initial" || fileType === "finish") {
-                    // Get the correct file path
                     let path = fileType === "initial" ? row.file_path : row.finish_file_path;
 
                     if (!path || path.trim() === "") {
@@ -328,7 +322,6 @@ export default function Datatable({
                     const encodedPath = encodeURIComponent(path);
                     const finalUrl = `${base_url}/download?path=${encodedPath}`;
                     const filename = `${fileType}_${id}`;
-
                     const link = document.createElement("a");
                     link.href = finalUrl;
                     link.target = "_blank";
@@ -337,6 +330,7 @@ export default function Datatable({
                     link.click();
                     document.body.removeChild(link);
                 }
+
             } catch (err) {
                 console.error("Download error:", err);
                 missingFiles.push(id);
