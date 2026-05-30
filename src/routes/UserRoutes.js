@@ -19,6 +19,7 @@ import RedesignCases from '../pages/user/RedesignCases';
 import { UserProvider } from "../Context/UserContext";
 import SearchOrder from '../pages/user/SearchOrder';
 import Register from '../pages/user/Register.js';
+import OrderDetails from "../pages/user/OrderDetails.js";
 
 export default function UserRoutes() {
     document.title = 'Clients Login | Portal'
@@ -46,6 +47,7 @@ export default function UserRoutes() {
                 <Route path='/search-order/:searchData' element={<SearchOrder />} />
                 <Route path='/profile' element={<Profile />} />
                 <Route path='/register' element={<Register />} />
+                <Route path='/orderDeatails/:id' element={<OrderDetails />} />
             </Routes>
         </UserProvider>
     )

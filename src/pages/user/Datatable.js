@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { fetchWithAuth } from '../../utils/userapi';
 import { UserContext } from "../../Context/UserContext";
+import { Link } from "react-router-dom";
 
 import {
     faRepeat,
@@ -194,7 +195,7 @@ export default function Datatable({
     const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
     const [orderid, setOrderid] = useState(null);
     const { user } = useContext(UserContext);
-    
+
     const [selectedRows, setSelectedRows] = useState([]);
     const [fileType, setFileType] = useState("stl");
 
@@ -768,68 +769,73 @@ export default function Datatable({
                                                                         : 'align-top'
                                                                     }`}
                                                             >
-                                                                {col.header === 'Message' ? (
-                                                                    <div className="flex justify-center items-center relative">
-                                                                        <div className="relative group">
-                                                                            <img
-                                                                                src="/img/messages.png"
-                                                                                alt="Message"
-                                                                                className="w-9 h-9 cursor-pointer transition-all duration-200 group-hover:scale-110 group-hover:rotate-12"
-                                                                                onClick={() => openPopup(`${row.orderid}`)}
-                                                                            />
-                                                                            <span className="absolute -top-2 -right-2 bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[12px] font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center shadow-[0_0_8px_rgba(255,0,0,0.6)] ring-2 ring-white/60 backdrop-blur-sm">
-                                                                                {row.totalMessages > 99 ? '99+' : row.totalMessages}
-                                                                            </span>
+                                                                {
+                                                                    col.header === 'Order Id' ? (
+                                                                        <div>
+                                                                            <Link to={`/user/orderDeatails/${row.orderid}`} className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-bold" > {row.orderid} </Link>
                                                                         </div>
-                                                                    </div>
-                                                                ) : col.header === 'Status' ? (
-                                                                    <div className="flex justify-center">
-                                                                        {(() => {
-                                                                            let statusColor = '';
-                                                                            let textColor = 'text-white';
-
-                                                                            switch (row.status?.toLowerCase()) {
-                                                                                case 'completed':
-                                                                                    statusColor = 'bg-gradient-to-r from-green-500 to-green-600';
-                                                                                    break;
-                                                                                case 'pending':
-                                                                                    statusColor = 'bg-gradient-to-r from-yellow-500 to-yellow-600';
-                                                                                    textColor = 'text-gray-900';
-                                                                                    break;
-                                                                                case 'new':
-                                                                                    statusColor = 'bg-gradient-to-r from-blue-500 to-blue-600';
-                                                                                    break;
-                                                                                case 'cancelled':
-                                                                                    statusColor = 'bg-gradient-to-r from-red-500 to-red-600';
-                                                                                    break;
-                                                                                case 'qc':
-                                                                                    statusColor = 'bg-gradient-to-r from-purple-500 to-purple-600';
-                                                                                    break;
-                                                                                case 'redesign':
-                                                                                    statusColor = 'bg-gradient-to-r from-orange-500 to-orange-600';
-                                                                                    break;
-                                                                                default:
-                                                                                    statusColor = 'bg-gradient-to-r from-gray-500 to-gray-600';
-                                                                                    break;
-                                                                            }
-
-                                                                            return (
-                                                                                <span
-                                                                                    className={`px-3 py-1.5 text-xs font-bold rounded-full shadow-md ${statusColor} ${textColor} transition-all duration-200 hover:shadow-lg`}
-                                                                                >
-                                                                                    {row.status ? row.status : 'Unknown'}
+                                                                    ) : col.header === 'Message' ? (
+                                                                        <div className="flex justify-center items-center relative">
+                                                                            <div className="relative group">
+                                                                                <img
+                                                                                    src="/img/messages.png"
+                                                                                    alt="Message"
+                                                                                    className="w-9 h-9 cursor-pointer transition-all duration-200 group-hover:scale-110 group-hover:rotate-12"
+                                                                                    onClick={() => openPopup(`${row.orderid}`)}
+                                                                                />
+                                                                                <span className="absolute -top-2 -right-2 bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[12px] font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center shadow-[0_0_8px_rgba(255,0,0,0.6)] ring-2 ring-white/60 backdrop-blur-sm">
+                                                                                    {row.totalMessages > 99 ? '99+' : row.totalMessages}
                                                                                 </span>
-                                                                            );
-                                                                        })()}
-                                                                    </div>
-                                                                ) : (
-                                                                    <div
-                                                                        className={`break-words whitespace-normal ${isLongText(row[col.accessor]) ? 'min-w-[150px] max-w-[250px]' : ''}`}
-                                                                        title={row[col.accessor] ?? "-"}
-                                                                    >
-                                                                        {row[col.accessor] ?? "-"}
-                                                                    </div>
-                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    ) : col.header === 'Status' ? (
+                                                                        <div className="flex justify-center">
+                                                                            {(() => {
+                                                                                let statusColor = '';
+                                                                                let textColor = 'text-white';
+
+                                                                                switch (row.status?.toLowerCase()) {
+                                                                                    case 'completed':
+                                                                                        statusColor = 'bg-gradient-to-r from-green-500 to-green-600';
+                                                                                        break;
+                                                                                    case 'pending':
+                                                                                        statusColor = 'bg-gradient-to-r from-yellow-500 to-yellow-600';
+                                                                                        textColor = 'text-gray-900';
+                                                                                        break;
+                                                                                    case 'new':
+                                                                                        statusColor = 'bg-gradient-to-r from-blue-500 to-blue-600';
+                                                                                        break;
+                                                                                    case 'cancelled':
+                                                                                        statusColor = 'bg-gradient-to-r from-red-500 to-red-600';
+                                                                                        break;
+                                                                                    case 'qc':
+                                                                                        statusColor = 'bg-gradient-to-r from-purple-500 to-purple-600';
+                                                                                        break;
+                                                                                    case 'redesign':
+                                                                                        statusColor = 'bg-gradient-to-r from-orange-500 to-orange-600';
+                                                                                        break;
+                                                                                    default:
+                                                                                        statusColor = 'bg-gradient-to-r from-gray-500 to-gray-600';
+                                                                                        break;
+                                                                                }
+
+                                                                                return (
+                                                                                    <span
+                                                                                        className={`px-3 py-1.5 text-xs font-bold rounded-full shadow-md ${statusColor} ${textColor} transition-all duration-200 hover:shadow-lg`}
+                                                                                    >
+                                                                                        {row.status ? row.status : 'Unknown'}
+                                                                                    </span>
+                                                                                );
+                                                                            })()}
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div
+                                                                            className={`break-words whitespace-normal ${isLongText(row[col.accessor]) ? 'min-w-[150px] max-w-[250px]' : ''}`}
+                                                                            title={row[col.accessor] ?? "-"}
+                                                                        >
+                                                                            {row[col.accessor] ?? "-"}
+                                                                        </div>
+                                                                    )}
                                                             </td>
                                                         ))}
                                                     </tr>
